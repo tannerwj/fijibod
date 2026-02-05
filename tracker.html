@@ -363,19 +363,37 @@
     </div>
     
     <script>
-        // Load saved data
-        let stats = JSON.parse(localStorage.getItem('fijiStats') || '{"workouts": 0, "streak": 0, "weight": null, "goal": null, "start": null, "history": []}');
+        const API_URL = 'https://fijibod-api.twj.workers.dev';
         
-        function saveStats() {
-            localStorage.setItem('fijiStats', JSON.stringify(stats));
+        // Get or set username
+        let userName = localStorage.getItem('fijiUserName');
+        if (!userName) {
+            userName = prompt('Enter your name to start tracking:') || 'Anonymous';
+            localStorage.setItem('fijiUserName', userName);
         }
         
-        function updateDisplay() {
-            document.getElementById('totalWorkouts').textContent = stats.workouts;
-            document.getElementById('streak').textContent = stats.streak + ' days';
-            document.getElementById('displayWeight').textContent = stats.weight || '--';
-            document.getElementById('startWeight').textContent = stats.start || '--';
-            document.getElementById('toGoal').textContent = stats.goal && stats.weight ? (stats.weight - stats.goal).toFixed(1) : '--';
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API_URL}/api/users`);
+                const users = await res.json();
+                const user = users.find(u => u.name === userName);
+                
+                if (user) {
+                    document.getElementById('totalWorkouts').textContent = user.total_workouts || 0;
+                    document.getElementById('streak').textContent = (user.current_streak || 0) + ' days';
+                    document.getElementById('displayWeight').textContent = user.current_weight || '--';
+                    document.getElementById('startWeight').textContent = user.start_weight || '--';
+                    document.getElementById('toGoal').textContent = user.goal_weight && user.current_weight ? 
+                        (user.current_weight - user.goal_weight).toFixed(1) : '--';
+                }
+                
+                // Load global stats
+                const statsRes = await fetch(`${API_URL}/api/stats`);
+                const stats = await statsRes.json();
+                document.getElementById('thisWeek').textContent = stats.total_workouts || 0;
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+            }
             
             // Update journey progress
             const targetDate = new Date('2026-06-04').getTime();
@@ -386,7 +404,7 @@
             document.getElementById('journeyProgress').textContent = Math.round(percent) + '% TO FIJI';
         }
         
-        function logWorkout() {
+        async function logWorkout() {
             const type = document.getElementById('workoutType').value;
             const amount = document.getElementById('workoutAmount').value;
             
@@ -395,19 +413,29 @@
                 return;
             }
             
-            stats.workouts++;
-            stats.history.push({ date: new Date().toISOString(), type, amount });
-            saveStats();
-            updateDisplay();
-            
-            // Clear inputs
-            document.getElementById('workoutType').value = '';
-            document.getElementById('workoutAmount').value = '';
-            
-            alert(`🔥 LOGGED: ${type} - ${amount}\n\nTotal workouts: ${stats.workouts}\n\nKeep stacking! 💪`);
+            try {
+                const res = await fetch(`${API_URL}/api/workouts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: userName, workout_type: type, amount })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    document.getElementById('workoutType').value = '';
+                    document.getElementById('workoutAmount').value = '';
+                    alert(`🔥 LOGGED: ${type} - ${amount}\n\n+${data.workout.points} points!\nTotal: ${data.user.total_workouts} workouts\n\nKeep stacking! 💪`);
+                    loadStats();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to log'));
+                }
+            } catch (e) {
+                alert('Failed to connect. Try again! 🔥');
+            }
         }
         
-        function updateWeight() {
+        async function updateWeight() {
             const current = parseFloat(document.getElementById('currentWeight').value);
             const goal = parseFloat(document.getElementById('goalWeight').value);
             
@@ -416,37 +444,67 @@
                 return;
             }
             
-            if (!stats.start) stats.start = current;
-            stats.weight = current;
-            if (goal) stats.goal = goal;
-            
-            saveStats();
-            updateDisplay();
-            
-            const diff = stats.start - current;
-            const message = diff > 0 ? 
-                `Down ${diff.toFixed(1)} lbs from start! 🔥` : 
-                diff < 0 ? `Up ${Math.abs(diff).toFixed(1)} lbs - adjust and keep going! 💪` : 
-                'Same as start - time to push harder! ⚡';
-            
-            alert(`📊 WEIGHT LOGGED: ${current} lbs\n\n${message}`);
+            try {
+                // Create/update user with weight
+                const res = await fetch(`${API_URL}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name: userName, 
+                        current_weight: current,
+                        goal_weight: goal || null
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success || data.error === 'Name already taken') {
+                    document.getElementById('currentWeight').value = '';
+                    document.getElementById('goalWeight').value = '';
+                    
+                    const diff = (data.user?.start_weight || current) - current;
+                    const message = diff > 0 ? 
+                        `Down ${diff.toFixed(1)} lbs! 🔥` : 
+                        diff < 0 ? `Up ${Math.abs(diff).toFixed(1)} lbs` : 'Logged!';
+                    
+                    alert(`📊 WEIGHT LOGGED: ${current} lbs\n\n${message}`);
+                    loadStats();
+                }
+            } catch (e) {
+                alert('Failed to update weight. Try again! 📊');
+            }
         }
         
         function toggleCheck(el) {
             el.classList.toggle('checked');
         }
         
+        function changeName() {
+            const newName = prompt('Enter new name:', userName);
+            if (newName) {
+                userName = newName;
+                localStorage.setItem('fijiUserName', userName);
+                loadStats();
+            }
+        }
+        
         // Initialize
-        updateDisplay();
+        loadStats();
         
         // Random chart bars for demo
         document.querySelectorAll('.chart-bar').forEach(bar => {
             bar.style.height = Math.floor(Math.random() * 80 + 10) + '%';
         });
         
+        // Add name changer
+        const nav = document.querySelector('nav');
+        const nameBtn = document.createElement('span');
+        nameBtn.innerHTML = ' | <a href="#" onclick="changeName(); return false;" style="font-size:0.8rem;opacity:0.6;">Change Name (' + userName + ')</a>';
+        nav.appendChild(nameBtn);
+        
         // Console easter egg
-        console.log('%c📊 TRACKER LOADED 📊', 'font-size: 25px; color: #00d4ff;');
-        console.log('%cYour data is stored locally. Keep grinding! 💪', 'font-size: 14px; color: #888;');
+        console.log('%c📊 TRACKER CONNECTED 📊', 'font-size: 25px; color: #00d4ff;');
+        console.log('%cUser: ' + userName, 'font-size: 14px; color: #888;');
     </script>
 </body>
 </html>

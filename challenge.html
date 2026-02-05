@@ -463,33 +463,109 @@
     </div>
     
     <script>
-        // Countdown to next Monday (challenge reset)
+        const API_URL = 'https://fijibod-api.twj.workers.dev';
+        let userName = localStorage.getItem('fijiUserName') || 'Anonymous';
+        let activeChallengeId = null;
+        
+        // Countdown to next Monday
         function updateNextChallenge() {
             const now = new Date();
             const nextMonday = new Date();
             nextMonday.setDate(now.getDate() + (1 + 7 - now.getDay()) % 7);
             nextMonday.setHours(0, 0, 0, 0);
-            
-            if (nextMonday < now) {
-                nextMonday.setDate(nextMonday.getDate() + 7);
-            }
-            
+            if (nextMonday < now) nextMonday.setDate(nextMonday.getDate() + 7);
             const diff = nextMonday - now;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
             document.getElementById('nextChallenge').textContent = 
                 `${String(days).padStart(2, '0')}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
-        
         setInterval(updateNextChallenge, 1000);
         updateNextChallenge();
         
-        function joinChallenge() {
-            alert('⚔️ CHALLENGE ACCEPTED! ⚔️\n\nYour name has been added to the combatant list.\n\nLog your reps on the tracker page.\n\nMay the best bod win!');
+        // Load active challenge
+        async function loadChallenge() {
+            try {
+                const res = await fetch(`${API_URL}/api/challenges/active`);
+                if (!res.ok) throw new Error('No active challenge');
+                const challenge = await res.json();
+                activeChallengeId = challenge.id;
+                
+                // Update DOM
+                document.querySelector('.challenge-title').textContent = challenge.name;
+                document.querySelector('.challenge-desc').textContent = challenge.description;
+                document.querySelector('.prize-amount').textContent = challenge.prize;
+                
+                // Update rules
+                const rulesList = document.querySelector('.challenge-rules ul');
+                rulesList.innerHTML = challenge.rules.split('|').map(r => `<li>${r}</li>`).join('');
+                
+                // Update participants
+                const partsContainer = document.querySelector('.participants');
+                if (challenge.participants?.length > 0) {
+                    partsContainer.innerHTML = challenge.participants.map(p => 
+                        `<span class="participant">${p}</span>`
+                    ).join('');
+                }
+                
+                // Update leaderboard if entries exist
+                if (challenge.entries?.length > 0) {
+                    const scoresDiv = document.createElement('div');
+                    scoresDiv.style.cssText = 'margin-top: 1.5rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px;';
+                    scoresDiv.innerHTML = '<h4 style="margin-bottom: 1rem;">🏆 Current Standings</h4>' +
+                        challenge.entries.map((e, i) => 
+                            `<div style="display: flex; justify-content: space-between; padding: 0.5rem;">
+                                <span>${i+1}. ${e.user_name}</span>
+                                <span style="color: var(--gold); font-weight: 800;">${e.score} reps</span>
+                            </div>`
+                        ).join('');
+                    document.querySelector('.active-challenge').appendChild(scoresDiv);
+                }
+            } catch (e) {
+                console.log('No active challenge loaded');
+            }
         }
+        
+        async function joinChallenge() {
+            if (!activeChallengeId) {
+                alert('No active challenge right now!');
+                return;
+            }
+            
+            const score = prompt('Enter your current score (reps, minutes, etc.):');
+            if (!score || isNaN(score)) {
+                alert('Enter a valid number! 🔥');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/api/challenge-entries`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_name: userName, 
+                        challenge_id: activeChallengeId,
+                        score: parseInt(score),
+                        notes: 'Joined via challenge page'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    alert('⚔️ CHALLENGE ACCEPTED! ⚔️\n\nScore logged. Keep pushing! 🔥');
+                    loadChallenge();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to join'));
+                }
+            } catch (e) {
+                alert('Failed to connect. Try again! 🔥');
+            }
+        }
+        
+        // Load on start
+        loadChallenge();
         
         // Console easter egg
         console.log('%c⚔️ CHALLENGE MODE ACTIVATED ⚔️', 'font-size: 30px; color: #ff4500;');

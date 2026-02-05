@@ -1,0 +1,8 @@
+name = "fijibod-api"
+main = "worker/index.js"
+compatibility_date = "2025-02-05"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fijibod-db"
+database_id = "f553bb2a-24d3-4af5-85fb-83075480339f"

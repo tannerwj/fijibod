@@ -493,61 +493,90 @@
     </div>
     
     <script>
-        // Sample data - replace with real data as people join
-        const warriors = [
-            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
-            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
-            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
-            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
-            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
-        ];
+        const API_URL = 'https://fijibod-api.twj.workers.dev';
+        const trends = { up: "📈", down: "📉", same: "➡️" };
         
-        const trends = {
-            up: "📈",
-            down: "📉",
-            same: "➡️"
-        };
-        
-        function renderLeaderboard() {
-            const body = document.getElementById('leaderboardBody');
-            body.innerHTML = warriors.map((w, i) => `
-                <div class="leaderboard-row">
-                    <div class="rank rank-${i + 1}">${i + 1}</div>
-                    <div class="name">
-                        ${w.name}
-                        ${w.streak > 7 ? '<span class="streak">🔥 ' + w.streak + ' DAYS</span>' : ''}
-                    </div>
-                    <div class="score">${w.score}</div>
-                    <div class="trend trend-${w.trend}">${trends[w.trend]}</div>
-                </div>
-            `).join('');
-            
-            // Update podium if we have real data
-            const realWarriors = warriors.filter(w => w.joined);
-            if (realWarriors.length >= 3) {
-                const sorted = [...realWarriors].sort((a, b) => b.score - a.score);
-                document.querySelector('.first .podium-name').textContent = sorted[0].name;
-                document.querySelector('.first .podium-score').textContent = sorted[0].score + ' pts';
-                document.querySelector('.second .podium-name').textContent = sorted[1].name;
-                document.querySelector('.second .podium-score').textContent = sorted[1].score + ' pts';
-                document.querySelector('.third .podium-name').textContent = sorted[2].name;
-                document.querySelector('.third .podium-score').textContent = sorted[2].score + ' pts';
+        async function loadLeaderboard() {
+            try {
+                const [leaderboardRes, statsRes, messagesRes] = await Promise.all([
+                    fetch(`${API_URL}/api/leaderboard`),
+                    fetch(`${API_URL}/api/stats`),
+                    fetch(`${API_URL}/api/messages`)
+                ]);
+                
+                const warriors = await leaderboardRes.json();
+                const stats = await statsRes.json();
+                const messages = await messagesRes.json();
+                
+                // Update podium
+                if (warriors.length > 0) {
+                    document.querySelector('.first .podium-name').textContent = warriors[0]?.name || 'TBD';
+                    document.querySelector('.first .podium-score').textContent = (warriors[0]?.score || 0) + ' pts';
+                }
+                if (warriors.length > 1) {
+                    document.querySelector('.second .podium-name').textContent = warriors[1]?.name || 'TBD';
+                    document.querySelector('.second .podium-score').textContent = (warriors[1]?.score || 0) + ' pts';
+                }
+                if (warriors.length > 2) {
+                    document.querySelector('.third .podium-name').textContent = warriors[2]?.name || 'TBD';
+                    document.querySelector('.third .podium-score').textContent = (warriors[2]?.score || 0) + ' pts';
+                }
+                
+                // Render table
+                const body = document.getElementById('leaderboardBody');
+                if (warriors.length === 0) {
+                    body.innerHTML = `
+                        <div class="leaderboard-row">
+                            <div class="rank">-</div>
+                            <div class="name">No warriors yet! Be the first to log a workout 💪</div>
+                            <div class="score">0</div>
+                            <div class="trend">-</div>
+                        </div>`;
+                } else {
+                    body.innerHTML = warriors.map((w, i) => `
+                        <div class="leaderboard-row">
+                            <div class="rank rank-${i < 3 ? i + 1 : ''}">${i + 1}</div>
+                            <div class="name">
+                                ${w.name}
+                                ${w.current_streak > 7 ? '<span class="streak">🔥 ' + w.current_streak + ' DAYS</span>' : ''}
+                            </div>
+                            <div class="score">${w.score}</div>
+                            <div class="trend trend-${w.trend}">${trends[w.trend]}</div>
+                        </div>
+                    `).join('');
+                }
+                
+                // Update stats
+                animateValue('totalWorkouts', 0, stats.total_workouts || 0, 2000);
+                animateValue('totalLbs', 0, Math.round(stats.total_lbs_lost || 0), 2000);
+                animateValue('topStreak', 0, stats.longest_streak || 0, 2000);
+                
+                // Update messages
+                if (messages.length > 0) {
+                    const trashContainer = document.querySelector('.trash-talk');
+                    trashContainer.innerHTML = '<h2>📢 Recent Trash Talk</h2>' +
+                        messages.slice(0, 5).map(m => `
+                            <div class="trash-message">
+                                "${m.message}"
+                                <div class="trash-author">— ${m.user_name}</div>
+                            </div>
+                        `).join('');
+                }
+            } catch (e) {
+                console.error('Failed to load leaderboard:', e);
             }
         }
         
-        renderLeaderboard();
-        
-        // Stats counter animation
         function animateValue(id, start, end, duration) {
             const obj = document.getElementById(id);
             const range = end - start;
+            if (range === 0) { obj.innerHTML = end; return; }
             const minTimer = 50;
             let stepTime = Math.abs(Math.floor(duration / range));
             stepTime = Math.max(stepTime, minTimer);
             let startTime = new Date().getTime();
             let endTime = startTime + duration;
             let timer;
-            
             function run() {
                 let now = new Date().getTime();
                 let remaining = Math.max((endTime - now) / duration, 0);
@@ -555,17 +584,28 @@
                 obj.innerHTML = value;
                 if (value == end) clearInterval(timer);
             }
-            
             timer = setInterval(run, stepTime);
             run();
         }
         
-        // Animate stats on load
-        window.addEventListener('load', () => {
-            animateValue('totalWorkouts', 0, 0, 2000);
-            animateValue('totalLbs', 0, 0, 2000);
-            animateValue('topStreak', 0, 0, 2000);
-        });
+        // Post trash talk
+        let userName = localStorage.getItem('fijiUserName') || 'Anonymous';
+        
+        async function postTrashTalk() {
+            const msg = prompt('Drop some trash talk:');
+            if (!msg) return;
+            
+            try {
+                await fetch(`${API_URL}/api/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: userName, message: msg })
+                });
+                loadLeaderboard();
+            } catch (e) {
+                alert('Failed to post. Try again! 🔥');
+            }
+        }
         
         // Secret code checker
         function checkCode() {
@@ -573,19 +613,27 @@
             if (code === 'FIJI2026') {
                 document.getElementById('secretPanel').classList.add('active');
                 document.getElementById('secretCode').value = '';
-                
-                // Confetti effect via console
                 console.log('%c🎉 SECRET CODE ACCEPTED! 🎉', 'font-size: 30px; color: #ffd700;');
-                console.log('%cYou\'ve unlocked the hidden panel!', 'font-size: 14px; color: #00d4ff;');
             } else if (code) {
                 alert('❌ Invalid code. Keep looking for clues!');
             }
         }
         
+        // Load on start
+        loadLeaderboard();
+        
+        // Add post button
+        const trashTalkSection = document.querySelector('.trash-talk');
+        const postBtn = document.createElement('button');
+        postBtn.className = 'code-button';
+        postBtn.style.marginTop = '1rem';
+        postBtn.textContent = '💬 Drop Some Trash';
+        postBtn.onclick = postTrashTalk;
+        trashTalkSection.appendChild(postBtn);
+        
         // Console easter egg
         console.log('%c🏆 FIJI BOD LEADERBOARD 🏆', 'font-size: 25px; color: #ffd700;');
-        console.log('%cWant to see the secret stats? Find the code hidden on this page...', 'font-size: 12px; color: #888;');
-        console.log('%cHint: Check the motivation page for clues', 'font-size: 11px; color: #666;');
+        console.log('%cLive data from D1 database!', 'font-size: 12px; color: #00d4ff;');
     </script>
 </body>
 </html>
