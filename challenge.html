@@ -314,6 +314,38 @@
             opacity: 0.6;
         }
         
+        .audio-player {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .audio-btn {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--gold);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            color: var(--gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .audio-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .audio-btn.playing {
+            background: rgba(255, 215, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
         .sword-cursor {
             cursor: crosshair;
         }
@@ -326,6 +358,16 @@
     </style>
 </head>
 <body class="sword-cursor">
+    <!-- Audio Player -->
+    <div class="audio-player">
+        <button class="audio-btn" id="audioBtn" onclick="toggleAudio()" title="Fiji Vibes 🌴">
+            🔇
+        </button>
+        <audio id="audio" loop muted>
+            <source src="fiji-ready.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+    
     <div class="container">
         <nav>
             <a href="index.html">← Back to Home</a>
@@ -570,6 +612,30 @@
         // Console easter egg
         console.log('%c⚔️ CHALLENGE MODE ACTIVATED ⚔️', 'font-size: 30px; color: #ff4500;');
         console.log('%cAccept the challenge. Log your reps. Claim victory.', 'font-size: 14px; color: #ffd700;');
+        
+        // Audio control
+        const audio = document.getElementById('audio');
+        const audioBtn = document.getElementById('audioBtn');
+        let isPlaying = false;
+        
+        function toggleAudio() {
+            if (isPlaying) {
+                audio.pause();
+                audioBtn.textContent = '🔇';
+                audioBtn.classList.remove('playing');
+                isPlaying = false;
+            } else {
+                audio.muted = false;
+                audio.play().then(() => {
+                    audioBtn.textContent = '🎵';
+                    audioBtn.classList.add('playing');
+                    isPlaying = true;
+                }).catch(e => {
+                    console.log('Audio play failed:', e);
+                    alert('Click again to enable audio! 🔊');
+                });
+            }
+        }
     </script>
 </body>
 </html>

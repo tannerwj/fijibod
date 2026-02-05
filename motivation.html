@@ -302,6 +302,38 @@
             50% { opacity: 0.7; }
         }
         
+        .audio-player {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .audio-btn {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--fire);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            color: var(--fire);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .audio-btn:hover {
+            background: rgba(255, 69, 0, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .audio-btn.playing {
+            background: rgba(255, 69, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .stat-number { font-size: 2rem; }
@@ -310,6 +342,16 @@
 </head>
 <body>
     <div class="burning"></div>
+    
+    <!-- Audio Player -->
+    <div class="audio-player">
+        <button class="audio-btn" id="audioBtn" onclick="toggleAudio()" title="Excuse Destroyer 🔥">
+            🔇
+        </button>
+        <audio id="audio" loop muted>
+            <source src="excuse-destroyer.mp3" type="audio/mpeg">
+        </audio>
+    </div>
     
     <div class="container">
         <nav>
@@ -516,6 +558,30 @@
                 setTimeout(() => {
                     response.innerHTML += '<br><br><span style="color: var(--gold);">🌴 SECRET UNLOCKED: Type FIJI2026 on the leaderboard page for a surprise!</span>';
                 }, 2000);
+            }
+        }
+        
+        // Audio control
+        const audio = document.getElementById('audio');
+        const audioBtn = document.getElementById('audioBtn');
+        let isPlaying = false;
+        
+        function toggleAudio() {
+            if (isPlaying) {
+                audio.pause();
+                audioBtn.textContent = '🔇';
+                audioBtn.classList.remove('playing');
+                isPlaying = false;
+            } else {
+                audio.muted = false;
+                audio.play().then(() => {
+                    audioBtn.textContent = '🔥';
+                    audioBtn.classList.add('playing');
+                    isPlaying = true;
+                }).catch(e => {
+                    console.log('Audio play failed:', e);
+                    alert('Click again to enable audio! 🔊');
+                });
             }
         }
     </script>
