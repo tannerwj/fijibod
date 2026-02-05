@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Lost at Sea | Fiji Bod</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(180deg, #00d4ff 0%, #0066cc 50%, #001a33 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            text-align: center;
+        }
+        
+        .ocean {
+            font-size: 8rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        h1 {
+            font-size: 6rem;
+            margin: 1rem 0;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        p {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            max-width: 600px;
+        }
+        
+        .message {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            margin: 2rem 0;
+        }
+        
+        .home-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: #ffd700;
+            color: #000;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        
+        .home-link:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .island {
+            position: absolute;
+            bottom: 10%;
+            font-size: 4rem;
+            opacity: 0.5;
+        }
+        
+        .island-1 { left: 10%; animation: drift 20s infinite; }
+        .island-2 { right: 15%; animation: drift 25s infinite reverse; }
+        
+        @keyframes drift {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="island island-1">🏝️</div>
+    <div class="island island-2">🌴</div>
+    
+    <div class="ocean">🌊🧍🌊</div>
+    
+    <h1>404</h1>
+    
+    <div class="message">
+        <p>You've drifted away from the main island...</p>
+        <p style="font-size: 1.2rem; opacity: 0.8; margin-top: 1rem;">
+            This page doesn't exist. Maybe it never did.<br>
+            Maybe you're just dehydrated from your workout.<br>
+            Either way, let's get you back on track.
+        </p>
+    </div>
+    
+    <a href="index.html" class="home-link">🏠 Swim Back to Shore</a>
+    
+    <script>
+        console.log('%c🌊 404 - LOST AT SEA 🌊', 'font-size: 25px; color: #00d4ff;');
+        console.log('%cDon\'t worry, even the best navigators get lost sometimes.', 'font-size: 14px; color: #fff;');
+    </script>
+</body>
+</html>
