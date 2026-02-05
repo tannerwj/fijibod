@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ CHALLENGES | Fiji Bod</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd700;
+            --fire: #ff4500;
+            --ocean: #00d4ff;
+            --success: #00ff00;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        nav {
+            text-align: center;
+            padding: 1rem 0;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+        
+        nav a:hover { opacity: 1; }
+        
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            text-align: center;
+            margin: 1rem 0;
+            color: var(--gold);
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .active-challenge {
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.2), rgba(255, 140, 0, 0.2));
+            border: 3px solid var(--fire);
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .active-challenge::before {
+            content: '⚔️ LIVE CHALLENGE ⚔️';
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: var(--fire);
+            padding: 5px 40px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            transform: rotate(45deg);
+        }
+        
+        .challenge-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+        
+        .challenge-desc {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .challenge-rules {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+        }
+        
+        .challenge-rules h3 {
+            color: var(--fire);
+            margin-bottom: 1rem;
+        }
+        
+        .challenge-rules ul {
+            list-style: none;
+        }
+        
+        .challenge-rules li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .challenge-rules li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+        }
+        
+        .prize-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.1));
+            border: 2px solid var(--gold);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        .prize-box h3 {
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .prize-amount {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+        
+        .participants {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            justify-content: center;
+        }
+        
+        .participant {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .join-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--fire), #ff6b35);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .join-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 69, 0, 0.4);
+        }
+        
+        .past-challenges {
+            margin: 3rem 0;
+        }
+        
+        .past-challenges h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+        
+        .challenge-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .challenge-card:hover {
+            border-color: var(--ocean);
+            transform: translateX(10px);
+        }
+        
+        .challenge-card.winner {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.05);
+        }
+        
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .challenge-name {
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+        
+        .challenge-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        
+        .status-completed {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        
+        .status-upcoming {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--ocean);
+        }
+        
+        .winner-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: #000;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            margin-top: 1rem;
+        }
+        
+        .hall-of-fame {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .hall-of-fame h2 {
+            text-align: center;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+        
+        .champions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .champion {
+            text-align: center;
+        }
+        
+        .champion-crown {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .champion-name {
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+        
+        .champion-title {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+        
+        .countdown-small {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+        }
+        
+        .countdown-small h3 {
+            color: var(--fire);
+            margin-bottom: 1rem;
+        }
+        
+        .mini-countdown {
+            font-size: 2rem;
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            opacity: 0.6;
+        }
+        
+        .sword-cursor {
+            cursor: crosshair;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .challenge-title { font-size: 1.5rem; }
+            .active-challenge::before { display: none; }
+        }
+    </style>
+</head>
+<body class="sword-cursor">
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Home</a>
+        </nav>
+        
+        <h1>⚔️ Weekly Battles ⚔️</h1>
+        <p class="subtitle">Push yourself. Crush your coworkers. Win glory.</p>
+        
+        <div class="countdown-small">
+            <h3>🔥 Next Challenge Begins In:</h3>
+            <div class="mini-countdown" id="nextChallenge">00:00:00:00</div>
+        </div>
+        
+        <div class="active-challenge">
+            <div class="challenge-title">Week 1: The 1000 Rep Gauntlet</div>
+            <div class="challenge-desc">
+                1000 reps total this week. Any exercise counts. Pushups, squats, lunges, crunches, burpees.
+                Log your reps. Rack up points. Dominate.
+            </div>
+            
+            <div class="challenge-rules">
+                <h3>⚔️ Rules of Engagement</h3>
+                <ul>
+                    <li>100 reps = 10 points on the leaderboard</li>
+                    <li>Must log reps within 24 hours of completing them</li>
+                    <li>Video proof required for final 100 reps</li>
+                    <li>Winner gets bragging rights + mystery prize</li>
+                    <li>Last place buys the winner's post-workout smoothie</li>
+                </ul>
+            </div>
+            
+            <div class="prize-box">
+                <h3>🏆 This Week's Prize</h3>
+                <div class="prize-amount">Eternal Glory</div>
+                <p style="margin-top: 0.5rem; opacity: 0.8;">+ Premium protein powder</p>
+            </div>
+            
+            <p style="margin: 1.5rem 0; text-align: center;">
+                <strong>Current Combatants:</strong>
+            </p>
+            <div class="participants">
+                <span class="participant">Awaiting challengers...</span>
+            </div>
+            
+            <button class="join-button" onclick="joinChallenge()">JOIN THE BATTLE</button>
+        </div>
+        
+        <div class="hall-of-fame">
+            <h2>👑 Hall of Fame 👑</h2>
+            <p style="text-align: center; margin-bottom: 1.5rem; opacity: 0.8;">
+                Future legends will be etched here
+            </p>
+            <div class="champions">
+                <div class="champion">
+                    <div class="champion-crown">👑</div>
+                    <div class="champion-name">TBD</div>
+                    <div class="champion-title">Week 1 Champion</div>
+                </div>
+                <div class="champion">
+                    <div class="champion-crown">👑</div>
+                    <div class="champion-name">TBD</div>
+                    <div class="champion-title">Week 2 Champion</div>
+                </div>
+                <div class="champion">
+                    <div class="champion-crown">👑</div>
+                    <div class="champion-name">TBD</div>
+                    <div class="champion-title">Week 3 Champion</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="past-challenges">
+            <h2>📅 Challenge Calendar</h2>
+            
+            <div class="challenge-card winner">
+                <div class="challenge-header">
+                    <span class="challenge-name">🔥 The Great Pushup War</span>
+                    <span class="challenge-status status-upcoming">Week 2</span>
+                </div>
+                <p>Most pushups in 7 days. Variations allowed. Chest to floor or it doesn't count.</p>
+                <span class="winner-badge">👑 Winner TBD</span>
+            </div>
+            
+            <div class="challenge-card">
+                <div class="challenge-header">
+                    <span class="challenge-name">⏱️ Plank Masters</span>
+                    <span class="challenge-status status-upcoming">Week 3</span>
+                </div>
+                <p>Longest cumulative plank time. Core strength showdown. No shaking allowed.</p>
+            </div>
+            
+            <div class="challenge-card">
+                <div class="challenge-header">
+                    <span class="challenge-name">🏃 Step Destroyer</span>
+                    <span class="challenge-status status-upcoming">Week 4</span>
+                </div>
+                <p>Most steps in a week. Walk, run, hike, whatever. Just move.</p>
+            </div>
+            
+            <div class="challenge-card">
+                <div class="challenge-header">
+                    <span class="challenge-name">💪 The 5K Challenge</span>
+                    <span class="challenge-status status-upcoming">Week 5</span>
+                </div>
+                <p>Fastest 5K run. Submit Strava/Garmin proof. Speed kills.</p>
+            </div>
+            
+            <div class="challenge-card">
+                <div class="challenge-header">
+                    <span class="challenge-name">🎯 Perfect Week</span>
+                    <span class="challenge-status status-upcoming">Week 6</span>
+                </div>
+                <p>7 days of workouts, no misses. Consistency is king.</p>
+            </div>
+        </div>
+        
+        <div class="active-challenge" style="border-color: var(--gold); background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));">
+            <div class="challenge-title">🌴 ULTIMATE CHALLENGE: Fiji Six-Pack Showdown</div>
+            <div class="challenge-desc">
+                The grand finale. June 4th reveal party. Beach body competition.
+                Categories: Most Improved, Best Abs, Best Overall Transformation.
+            </div>
+            
+            <div class="prize-box">
+                <h3>🏆 Grand Prize</h3>
+                <div class="prize-amount">Fiji Legend Status</div>
+                <p style="margin-top: 0.5rem; opacity: 0.8;">+ Mystery trophy + Company-wide recognition</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>⚔️ Train hard. Compete harder. Win everything. ⚔️</p>
+            <p style="margin-top: 0.5rem;"><a href="index.html" style="color: var(--gold);">← Back to Countdown</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        // Countdown to next Monday (challenge reset)
+        function updateNextChallenge() {
+            const now = new Date();
+            const nextMonday = new Date();
+            nextMonday.setDate(now.getDate() + (1 + 7 - now.getDay()) % 7);
+            nextMonday.setHours(0, 0, 0, 0);
+            
+            if (nextMonday < now) {
+                nextMonday.setDate(nextMonday.getDate() + 7);
+            }
+            
+            const diff = nextMonday - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('nextChallenge').textContent = 
+                `${String(days).padStart(2, '0')}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        
+        setInterval(updateNextChallenge, 1000);
+        updateNextChallenge();
+        
+        function joinChallenge() {
+            alert('⚔️ CHALLENGE ACCEPTED! ⚔️\n\nYour name has been added to the combatant list.\n\nLog your reps on the tracker page.\n\nMay the best bod win!');
+        }
+        
+        // Console easter egg
+        console.log('%c⚔️ CHALLENGE MODE ACTIVATED ⚔️', 'font-size: 30px; color: #ff4500;');
+        console.log('%cAccept the challenge. Log your reps. Claim victory.', 'font-size: 14px; color: #ffd700;');
+    </script>
+</body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 LEADERBOARD | Fiji Bod</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            --ocean: #00d4ff;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        nav {
+            text-align: center;
+            padding: 1rem 0;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+        
+        nav a:hover { opacity: 1; }
+        
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            text-align: center;
+            margin: 1rem 0 2rem;
+            background: linear-gradient(90deg, var(--gold), #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 1rem;
+            margin: 3rem 0;
+            height: 250px;
+        }
+        
+        .podium-spot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 1rem;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .podium-spot:hover {
+            transform: translateY(-10px);
+        }
+        
+        .first {
+            background: linear-gradient(180deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1));
+            border: 3px solid var(--gold);
+            height: 250px;
+            width: 150px;
+            order: 2;
+        }
+        
+        .second {
+            background: linear-gradient(180deg, rgba(192, 192, 192, 0.3), rgba(192, 192, 192, 0.1));
+            border: 3px solid var(--silver);
+            height: 200px;
+            width: 130px;
+            order: 1;
+        }
+        
+        .third {
+            background: linear-gradient(180deg, rgba(205, 127, 50, 0.3), rgba(205, 127, 50, 0.1));
+            border: 3px solid var(--bronze);
+            height: 150px;
+            width: 130px;
+            order: 3;
+        }
+        
+        .medal {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .podium-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .podium-score {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+        
+        .leaderboard-table {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .leaderboard-header {
+            display: grid;
+            grid-template-columns: 80px 1fr 100px 100px;
+            padding: 1.5rem;
+            background: rgba(255, 215, 0, 0.1);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .leaderboard-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 100px 100px;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
+            align-items: center;
+        }
+        
+        .leaderboard-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .leaderboard-row:last-child {
+            border-bottom: none;
+        }
+        
+        .rank {
+            font-weight: 900;
+            font-size: 1.3rem;
+        }
+        
+        .rank-1 { color: var(--gold); }
+        .rank-2 { color: var(--silver); }
+        .rank-3 { color: var(--bronze); }
+        
+        .name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .streak {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b35, #ff4500);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+        
+        .score {
+            font-weight: 800;
+            color: var(--gold);
+        }
+        
+        .trend {
+            text-align: center;
+        }
+        
+        .trend-up { color: #00ff00; }
+        .trend-down { color: #ff4500; }
+        .trend-same { color: var(--silver); }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .stat-box:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+        
+        .stat-box-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+        
+        .stat-box-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        
+        .trash-talk {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 100, 0, 0.1));
+            border: 2px solid rgba(255, 69, 0, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .trash-talk h2 {
+            color: #ff6b35;
+            margin-bottom: 1rem;
+        }
+        
+        .trash-message {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 10px;
+            border-left: 3px solid #ff6b35;
+        }
+        
+        .trash-author {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+        
+        .achievement-wall {
+            background: rgba(255, 215, 0, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .achievement-wall h2 {
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+        
+        .achievements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .achievement {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+            border: 2px solid transparent;
+        }
+        
+        .achievement.unlocked {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .achievement-icon {
+            font-size: 1.5rem;
+        }
+        
+        .secret-panel {
+            display: none;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(255, 215, 0, 0.2));
+            border: 3px solid var(--gold);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .secret-panel.active {
+            display: block;
+            animation: reveal 0.5s ease;
+        }
+        
+        @keyframes reveal {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .code-input {
+            padding: 1rem 2rem;
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--gold);
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            width: 200px;
+        }
+        
+        .code-button {
+            padding: 1rem 2rem;
+            background: var(--gold);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 800;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            opacity: 0.6;
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @media (max-width: 768px) {
+            .podium { height: 200px; }
+            .first { height: 200px; width: 100px; }
+            .second, .third { height: 150px; width: 90px; }
+            .leaderboard-header,
+            .leaderboard-row { grid-template-columns: 50px 1fr 70px 60px; font-size: 0.85rem; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Home</a>
+        </nav>
+        
+        <h1 class="floating">🏆 THE WALL OF GLORY 🏆</h1>
+        
+        <div class="podium">
+            <div class="podium-spot second">
+                <span class="medal">🥈</span>
+                <div class="podium-name">TBD</div>
+                <div class="podium-score">?? pts</div>
+            </div>
+            <div class="podium-spot first">
+                <span class="medal">🥇</span>
+                <div class="podium-name">TBD</div>
+                <div class="podium-score">?? pts</div>
+                <span style="font-size: 0.7rem; margin-top: 0.5rem; opacity: 0.8;">CHAMPION</span>
+            </div>
+            <div class="podium-spot third">
+                <span class="medal">🥉</span>
+                <div class="podium-name">TBD</div>
+                <div class="podium-score">?? pts</div>
+            </div>
+        </div>
+        
+        <div class="stats-cards">
+            <div class="stat-box">
+                <div class="stat-box-value" id="totalWorkouts">0</div>
+                <div class="stat-box-label">Total Workouts Logged</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-box-value" id="totalLbs">0</div>
+                <div class="stat-box-label">Pounds Lost Combined</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-box-value" id="topStreak">0</div>
+                <div class="stat-box-label">Longest Streak (Days)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-box-value">??</div>
+                <div class="stat-box-label">Days Until Reveal</div>
+            </div>
+        </div>
+        
+        <div class="leaderboard-table">
+            <div class="leaderboard-header">
+                <div>Rank</div>
+                <div>Warrior</div>
+                <div>Score</div>
+                <div>Trend</div>
+            </div>
+            <div id="leaderboardBody">
+                <!-- Will be populated by JS -->
+            </div>
+        </div>
+        
+        <div class="achievement-wall">
+            <h2>🏅 Achievement Unlocks</h2>
+            <div class="achievements">
+                <div class="achievement unlocked">
+                    <span class="achievement-icon">🌴</span>
+                    <span><strong>Site Launch</strong><br><small>Feb 5, 2026</small></span>
+                </div>
+                <div class="achievement">
+                    <span class="achievement-icon">🔥</span>
+                    <span><strong>7-Day Streak</strong><br><small>First week down</small></span>
+                </div>
+                <div class="achievement">
+                    <span class="achievement-icon">💯</span>
+                    <span><strong>Century Club</strong><br><small>100 workouts</small></span>
+                </div>
+                <div class="achievement">
+                    <span class="achievement-icon">🎯</span>
+                    <span><strong>Goal Weight</strong><br><small>Hit the target</small></span>
+                </div>
+                <div class="achievement">
+                    <span class="achievement-icon">👑</span>
+                    <span><strong>Fiji Ready</strong><br><small>June 4 reveal</small></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="trash-talk">
+            <h2>📢 Recent Trash Talk</h2>
+            <div class="trash-message">
+                "Just hit a new PR on bench. Who's catching up? No one? That's what I thought. 💪"
+                <div class="trash-author">— Anonymous Top Performer</div>
+            </div>
+            <div class="trash-message">
+                "I see some of y'all logging 'rest days' 4 times a week. Rest from what? 🤔"
+                <div class="trash-author">— The Observant One</div>
+            </div>
+            <div class="trash-message">
+                "Meal prep Sunday complete. 5 days of gains ready. What did YOU do today?"
+                <div class="trash-author">— Future Fiji Champion</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 2rem 0;">
+            <p style="opacity: 0.7; margin-bottom: 1rem;">🥚 Found a secret code? Enter it below:</p>
+            <input type="text" class="code-input" id="secretCode" maxlength="8" placeholder="CODE">
+            <button class="code-button" onclick="checkCode()">UNLOCK</button>
+        </div>
+        
+        <div class="secret-panel" id="secretPanel">
+            <h2 style="color: var(--gold); margin-bottom: 1rem;">🎉 SECRET UNLOCKED! 🎉</h2>
+            <p>You found the hidden code! Here are your bonus stats:</p>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem;">
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px;">
+                    <strong>🔥 Shred Factor</strong><br>
+                    <span style="font-size: 2rem;">MAXIMUM</span>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px;">
+                    <strong>🌴 Fiji Readiness</strong><br>
+                    <span style="font-size: 2rem;">INCOMING</span>
+                </div>
+            </div>
+            <p style="margin-top: 1.5rem; font-size: 0.9rem; opacity: 0.8;">
+                Bonus tip: Check /shred.html for the ultimate motivation
+            </p>
+        </div>
+        
+        <footer>
+            <p>🏆 May the best bod win 🏆</p>
+            <p style="margin-top: 0.5rem;"><a href="index.html" style="color: var(--gold);">← Back to Countdown</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        // Sample data - replace with real data as people join
+        const warriors = [
+            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
+            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
+            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
+            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
+            { name: "???", score: 0, trend: "same", streak: 0, joined: false },
+        ];
+        
+        const trends = {
+            up: "📈",
+            down: "📉",
+            same: "➡️"
+        };
+        
+        function renderLeaderboard() {
+            const body = document.getElementById('leaderboardBody');
+            body.innerHTML = warriors.map((w, i) => `
+                <div class="leaderboard-row">
+                    <div class="rank rank-${i + 1}">${i + 1}</div>
+                    <div class="name">
+                        ${w.name}
+                        ${w.streak > 7 ? '<span class="streak">🔥 ' + w.streak + ' DAYS</span>' : ''}
+                    </div>
+                    <div class="score">${w.score}</div>
+                    <div class="trend trend-${w.trend}">${trends[w.trend]}</div>
+                </div>
+            `).join('');
+            
+            // Update podium if we have real data
+            const realWarriors = warriors.filter(w => w.joined);
+            if (realWarriors.length >= 3) {
+                const sorted = [...realWarriors].sort((a, b) => b.score - a.score);
+                document.querySelector('.first .podium-name').textContent = sorted[0].name;
+                document.querySelector('.first .podium-score').textContent = sorted[0].score + ' pts';
+                document.querySelector('.second .podium-name').textContent = sorted[1].name;
+                document.querySelector('.second .podium-score').textContent = sorted[1].score + ' pts';
+                document.querySelector('.third .podium-name').textContent = sorted[2].name;
+                document.querySelector('.third .podium-score').textContent = sorted[2].score + ' pts';
+            }
+        }
+        
+        renderLeaderboard();
+        
+        // Stats counter animation
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const minTimer = 50;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            stepTime = Math.max(stepTime, minTimer);
+            let startTime = new Date().getTime();
+            let endTime = startTime + duration;
+            let timer;
+            
+            function run() {
+                let now = new Date().getTime();
+                let remaining = Math.max((endTime - now) / duration, 0);
+                let value = Math.round(end - (remaining * range));
+                obj.innerHTML = value;
+                if (value == end) clearInterval(timer);
+            }
+            
+            timer = setInterval(run, stepTime);
+            run();
+        }
+        
+        // Animate stats on load
+        window.addEventListener('load', () => {
+            animateValue('totalWorkouts', 0, 0, 2000);
+            animateValue('totalLbs', 0, 0, 2000);
+            animateValue('topStreak', 0, 0, 2000);
+        });
+        
+        // Secret code checker
+        function checkCode() {
+            const code = document.getElementById('secretCode').value.toUpperCase();
+            if (code === 'FIJI2026') {
+                document.getElementById('secretPanel').classList.add('active');
+                document.getElementById('secretCode').value = '';
+                
+                // Confetti effect via console
+                console.log('%c🎉 SECRET CODE ACCEPTED! 🎉', 'font-size: 30px; color: #ffd700;');
+                console.log('%cYou\'ve unlocked the hidden panel!', 'font-size: 14px; color: #00d4ff;');
+            } else if (code) {
+                alert('❌ Invalid code. Keep looking for clues!');
+            }
+        }
+        
+        // Console easter egg
+        console.log('%c🏆 FIJI BOD LEADERBOARD 🏆', 'font-size: 25px; color: #ffd700;');
+        console.log('%cWant to see the secret stats? Find the code hidden on this page...', 'font-size: 12px; color: #888;');
+        console.log('%cHint: Check the motivation page for clues', 'font-size: 11px; color: #666;');
+    </script>
+</body>
+</html>

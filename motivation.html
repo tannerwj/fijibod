@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 GET MOTIVATED | Fiji Bod</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fire: #ff4500;
+            --gold: #ffd700;
+            --ocean: #00d4ff;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, #1a0a00 0%, #ff4500 50%, #ff6b35 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .burning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+            animation: flicker 0.1s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 0.03; }
+            50% { opacity: 0.06; }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        nav {
+            text-align: center;
+            padding: 1rem 0;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+        
+        nav a:hover { opacity: 1; }
+        
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3.5rem;
+            text-align: center;
+            margin: 2rem 0;
+            text-shadow: 0 0 40px var(--fire);
+            animation: burn 2s ease-in-out infinite;
+        }
+        
+        @keyframes burn {
+            0%, 100% { text-shadow: 0 0 40px var(--fire); }
+            50% { text-shadow: 0 0 80px var(--fire), 0 0 100px var(--gold); }
+        }
+        
+        .section {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            border: 2px solid rgba(255, 69, 0, 0.3);
+        }
+        
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+        
+        .truth-bomb {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 100, 0, 0.2));
+            border-left: 5px solid var(--fire);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 15px 15px 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--fire);
+            transform: scale(1.02);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        
+        .roast-section {
+            background: linear-gradient(135deg, rgba(50, 0, 0, 0.5), rgba(100, 0, 0, 0.3));
+            border: 2px solid rgba(255, 0, 0, 0.5);
+        }
+        
+        .roast-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 15px;
+            border-left: 4px solid var(--fire);
+        }
+        
+        .roast-card p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .roast-author {
+            text-align: right;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: var(--gold);
+        }
+        
+        .workout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .workout-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .workout-card h3 {
+            color: var(--gold);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .workout-card ul {
+            list-style: none;
+        }
+        
+        .workout-card li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .workout-card li::before {
+            content: '🔥';
+            position: absolute;
+            left: 0;
+        }
+        
+        .cta-button {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 3rem auto;
+            padding: 1.5rem 3rem;
+            background: linear-gradient(135deg, var(--fire), #ff6b35);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255, 69, 0, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(255, 69, 0, 0.6);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--fire), var(--gold));
+            border-radius: 15px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+        
+        .excuse-destroyer {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px dashed rgba(255, 0, 0, 0.5);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .excuse-destroyer h3 {
+            color: var(--fire);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .excuse-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+            margin: 0.5rem 0;
+        }
+        
+        .excuse-button {
+            padding: 1rem 2rem;
+            background: var(--fire);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        #excuseResponse {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            min-height: 2rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            opacity: 0.6;
+        }
+        
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .stat-number { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="burning"></div>
+    
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Home</a>
+        </nav>
+        
+        <h1>🔥 NO EXCUSES 🔥</h1>
+        
+        <div class="truth-bomb">
+            💡 BRUTAL TRUTH: You have <span id="daysLeft">118</span> days. That's enough time to completely transform your body. But only if you start TODAY.
+        </div>
+        
+        <div class="section">
+            <h2>📊 The Math Doesn't Lie</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">0.5-1%</div>
+                    <div class="stat-label">Safe Body Fat Loss Per Week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">16</div>
+                    <div class="stat-label">Weeks Until Fiji</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8-16%</div>
+                    <div class="stat-label">Potential Body Fat Reduction</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">💯</div>
+                    <div class="stat-label">Chance You Regret Skipping Workouts</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <p style="margin-bottom: 1rem;">Your Fiji Body Progress</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="fijiProgress" style="width: 0%">0%</div>
+                </div>
+                <p style="font-size: 0.9rem; opacity: 0.7;">Time is passing whether you train or not. Choose wisely.</p>
+            </div>
+        </div>
+        
+        <div class="section roast-section">
+            <h2>🎯 Friendly Competition</h2>
+            <p style="margin-bottom: 1.5rem; opacity: 0.9;">Some motivational "encouragement" from your TaxHawk teammates:</p>
+            
+            <div class="roast-card">
+                <p>"I've been doing 100 pushups a day since January 1st. By June, I'll be able to do pushups with someone sitting on my back. What are YOU doing?"</p>
+                <div class="roast-author">— That Guy In Engineering</div>
+            </div>
+            
+            <div class="roast-card">
+                <p>"Beach photos are forever. Your grandchildren will see these. Do you want them to ask 'Why was grandpa wearing a shirt in every picture?'"</p>
+                <div class="roast-author">— The Designer Who Knows</div>
+            </div>
+            
+            <div class="roast-card">
+                <p>"I've already meal-prepped for the week. My macros are calculated. My gym bag is packed. Meanwhile, someone is reading this instead of working out..."</p>
+                <div class="roast-author">— Your Conscience</div>
+            </div>
+            
+            <div class="roast-card">
+                <p>"Remember: Everyone at the company will see these photos. HR included. Your beach body = your personal brand. Build it."</p>
+                <div class="roast-author">— Anonymous (but probably in Finance)</div>
+            </div>
+            
+            <div class="roast-card">
+                <p>"I've lost 12 lbs already. Not that I'm counting. Okay, I'm totally counting. I'm also counting how many workouts YOU'VE missed. 👀"</p>
+                <div class="roast-author">— The Competitor</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>💪 Six-Pack Blueprint</h2>
+            <div class="workout-grid">
+                <div class="workout-card">
+                    <h3>🔥 The Daily Burn</h3>
+                    <ul>
+                        <li>30 min cardio (run, bike, swim)</li>
+                        <li>3 sets × 20 crunches</li>
+                        <li>3 sets × 30-second planks</li>
+                        <li>3 sets × 15 leg raises</li>
+                        <li>2 sets × 20 Russian twists</li>
+                    </ul>
+                </div>
+                <div class="workout-card">
+                    <h3>🥗 The Kitchen Rules</h3>
+                    <ul>
+                        <li>Protein with every meal</li>
+                        <li>No liquid calories</li>
+                        <li>Veggies are unlimited</li>
+                        <li>Cut sugar, not flavor</li>
+                        <li>Meal prep Sundays</li>
+                    </ul>
+                </div>
+                <div class="workout-card">
+                    <h3>😴 Recovery = Gains</h3>
+                    <ul>
+                        <li>7-8 hours sleep minimum</li>
+                        <li>Stretch after workouts</li>
+                        <li>One rest day per week</li>
+                        <li>Hydrate like it's your job</li>
+                        <li>Progress pics weekly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="excuse-destroyer">
+            <h3>🚫 EXCUSE DESTROYER 3000</h3>
+            <p>Type your excuse below. We'll handle it.</p>
+            <input type="text" class="excuse-input" id="excuseInput" placeholder="e.g., 'I don't have time'..." onkeypress="if(event.key==='Enter')destroyExcuse()">
+            <br>
+            <button class="excuse-button" onclick="destroyExcuse()">DESTROY MY EXCUSE</button>
+            <div id="excuseResponse"></div>
+        </div>
+        
+        <a href="challenge.html" class="cta-button pulse">⚔️ Accept The Challenge ⚔️</a>
+        
+        <div class="section" style="text-align: center;">
+            <h2>🏆 The Fiji Six-Pack Club</h2>
+            <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 1rem;">
+                There's an exclusive club forming. The select few who will arrive in Fiji<br>
+                with visible abs and the confidence that comes with them.<br><br>
+                <strong style="color: var(--gold); font-size: 1.5rem;">Will you be in the club?</strong>
+            </p>
+            <p style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.7;">
+                Membership requirements: Consistency, discipline, and not quitting when it gets hard.
+            </p>
+        </div>
+        
+        <footer>
+            <p>🔥 Every rep counts. Every meal matters. Fiji is coming. 🔥</p>
+            <p style="margin-top: 0.5rem;"><a href="index.html" style="color: var(--gold);">← Back to Countdown</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        const targetDate = new Date('2026-06-04T00:00:00').getTime();
+        const startDate = new Date('2026-02-05T00:00:00').getTime();
+        const totalDuration = targetDate - startDate;
+        
+        function updateDays() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            const days = Math.ceil(distance / (1000 * 60 * 60 * 24));
+            document.getElementById('daysLeft').textContent = Math.max(0, days);
+            
+            const elapsed = now - startDate;
+            const percent = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+            document.getElementById('fijiProgress').style.width = percent + '%';
+            document.getElementById('fijiProgress').textContent = Math.round(percent) + '% COMPLETE';
+        }
+        
+        updateDays();
+        setInterval(updateDays, 60000);
+        
+        const excuses = {
+            'no time': "You have the same 24 hours as everyone else. The difference? Priorities. 30 minutes. That's a TV episode. Trade screen time for Fiji time.",
+            'tired': "You're tired NOW. Wait until you see the photos. Which tired do you prefer?",
+            'gym': "No gym needed. Pushups, squats, planks. Your body is the gym. Your floor is the equipment.",
+            'motivation': "Motivation is a lie. Discipline is the truth. Do it anyway. Especially when you don't want to.",
+            'diet': "You don't need a diet. You need a decision. Eat real food. Stop when full. Repeat.",
+            'sore': "Soreness is your muscles saying 'thank you, do it again.' Keep going.",
+            'busy': "Busy is a choice. So is fit. Choose wisely.",
+            'money': "Running is free. Pushups are free. The beach is free. Excuses cost you everything.",
+            'old': "Your body doesn't check ID at the door. It checks effort. Get moving.",
+            'travel': "Hotel gym. Bodyweight workout. Walk the city. Where there's a will, there's a way."
+        };
+        
+        const defaultRoasts = [
+            "That's not an excuse. That's a choice. And it's the wrong one.",
+            "Nice try. But Fiji doesn't accept excuses. Only results.",
+            "Your competitors just did another rep while you typed that.",
+            "Save that energy for one more set instead of excuses.",
+            "The beach is coming. That excuse won't hide your belly."
+        ];
+        
+        function destroyExcuse() {
+            const input = document.getElementById('excuseInput').value.toLowerCase().trim();
+            const response = document.getElementById('excuseResponse');
+            
+            if (!input) {
+                response.innerHTML = '<span style="color: var(--gold);">Type something first. Or better yet, just go work out. 🏃‍♂️</span>';
+                return;
+            }
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(excuses)) {
+                if (input.includes(key)) {
+                    response.innerHTML = `<span style="color: #00ff00;">✓ ${value}</span>`;
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                const randomRoast = defaultRoasts[Math.floor(Math.random() * defaultRoasts.length)];
+                response.innerHTML = `<span style="color: var(--fire);">🔥 ${randomRoast}</span>`;
+            }
+            
+            // Easter egg for specific phrases
+            if (input.includes('fiji') || input.includes('ready')) {
+                setTimeout(() => {
+                    response.innerHTML += '<br><br><span style="color: var(--gold);">🌴 SECRET UNLOCKED: Type FIJI2026 on the leaderboard page for a surprise!</span>';
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>

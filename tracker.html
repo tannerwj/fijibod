@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 TRACKER | Fiji Bod</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ocean: #00d4ff;
+            --gold: #ffd700;
+            --success: #00ff00;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a3a52 50%, #0a1628 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        nav {
+            text-align: center;
+            padding: 1rem 0;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+        
+        nav a:hover { opacity: 1; }
+        
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            text-align: center;
+            margin: 1rem 0;
+            color: var(--ocean);
+        }
+        
+        .subtitle {
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .tracker-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .tracker-card h3 {
+            color: var(--ocean);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .input-group {
+            margin: 1rem 0;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .log-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--ocean), #0066cc);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .log-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .stats-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-value {
+            font-weight: 800;
+            color: var(--ocean);
+        }
+        
+        .progress-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--ocean), var(--gold));
+            border-radius: 20px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+        
+        .chart-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 0.5rem;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--ocean), #0066cc);
+            border-radius: 5px 5px 0 0;
+            min-width: 30px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .chart-bar:hover {
+            background: linear-gradient(180deg, var(--gold), #ff6b35);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+        
+        .checklist {
+            list-style: none;
+        }
+        
+        .checklist li {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .checklist li:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .checklist li.checked {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid var(--success);
+        }
+        
+        .checklist li.checked::before {
+            content: '✅';
+        }
+        
+        .checklist li:not(.checked)::before {
+            content: '⬜';
+        }
+        
+        .motivation-quote {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 215, 0, 0.1));
+            border-left: 4px solid var(--gold);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 15px 15px 0;
+            font-style: italic;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            opacity: 0.6;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .chart-container { height: 150px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Home</a>
+        </nav>
+        
+        <h1>📊 Progress Tracker</h1>
+        <p class="subtitle">Data doesn't lie. Track everything. Watch yourself transform.</p>
+        
+        <div class="tracker-grid">
+            <div class="tracker-card">
+                <h3>💪 Log Workout</h3>
+                <div class="input-group">
+                    <label>Type</label>
+                    <input type="text" id="workoutType" placeholder="e.g., Pushups, Running, Weights">
+                </div>
+                <div class="input-group">
+                    <label>Reps / Minutes / Distance</label>
+                    <input type="text" id="workoutAmount" placeholder="e.g., 50 reps, 30 min, 3 miles">
+                </div>
+                <button class="log-button" onclick="logWorkout()">LOG IT 🔥</button>
+                
+                <div class="stats-display" style="margin-top: 1.5rem;">
+                    <div class="stat-row">
+                        <span>Total Workouts</span>
+                        <span class="stat-value" id="totalWorkouts">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>This Week</span>
+                        <span class="stat-value" id="thisWeek">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Current Streak</span>
+                        <span class="stat-value" id="streak">0 days</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tracker-card">
+                <h3>⚖️ Body Metrics</h3>
+                <div class="input-group">
+                    <label>Current Weight (lbs)</label>
+                    <input type="number" id="currentWeight" placeholder="e.g., 185">
+                </div>
+                <div class="input-group">
+                    <label>Goal Weight (lbs)</label>
+                    <input type="number" id="goalWeight" placeholder="e.g., 175">
+                </div>
+                <button class="log-button" onclick="updateWeight()">UPDATE 📊</button>
+                
+                <div class="stats-display" style="margin-top: 1.5rem;">
+                    <div class="stat-row">
+                        <span>Starting Weight</span>
+                        <span class="stat-value" id="startWeight">--</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Current</span>
+                        <span class="stat-value" id="displayWeight">--</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>To Goal</span>
+                        <span class="stat-value" id="toGoal">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <h3 style="text-align: center; margin-bottom: 1rem;">📈 Your Progress</h3>
+            
+            <p style="margin-bottom: 0.5rem;">Fiji Journey Progress</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="journeyProgress" style="width: 0%">0%</div>
+            </div>
+            
+            <p style="margin: 1rem 0 0.5rem;">Weekly Workouts (Last 7 Days)</p>
+            <div class="chart-container" id="weeklyChart">
+                <div class="chart-bar" style="height: 0%"><span class="chart-label">M</span></div>
+                <div class="chart-bar" style="height: 0%"><span class="chart-label">T</span></div>
+                <div class="chart-bar" style="height: 0%"><span class="chart-label">W</span></div>
+                <div class="chart-bar" style="height: 0%"><span class="chart-label">T</span></div>
+                <div class="chart-bar" style="height: 0%"><span class="chart-label">F</span></div>
+                <div class="chart-bar" style="height: 0%"><span class="chart-label">S</span></div>
+                <div class="chart-bar" style="height: 0%"><span class="chart-label">S</span></div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <h3 style="text-align: center; margin-bottom: 1rem;">✅ Daily Checklist</h3>
+            <ul class="checklist" id="dailyChecklist">
+                <li onclick="toggleCheck(this)">Workout completed</li>
+                <li onclick="toggleCheck(this)">Ate clean (no junk)</li>
+                <li onclick="toggleCheck(this)">Drank 8+ glasses water</li>
+                <li onclick="toggleCheck(this)">7-8 hours sleep</li>
+                <li onclick="toggleCheck(this)">Logged progress</li>
+            </ul>
+        </div>
+        
+        <div class="motivation-quote">
+            "What gets measured gets managed. What gets managed gets improved."
+            <br><span style="opacity: 0.7; font-size: 0.9rem; font-style: normal;">— The Path to Fiji</span>
+        </div>
+        
+        <footer>
+            <p>📊 Track it. Stack it. Watch the transformation. 📊</p>
+            <p style="margin-top: 0.5rem;"><a href="index.html" style="color: var(--ocean);">← Back to Countdown</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        // Load saved data
+        let stats = JSON.parse(localStorage.getItem('fijiStats') || '{"workouts": 0, "streak": 0, "weight": null, "goal": null, "start": null, "history": []}');
+        
+        function saveStats() {
+            localStorage.setItem('fijiStats', JSON.stringify(stats));
+        }
+        
+        function updateDisplay() {
+            document.getElementById('totalWorkouts').textContent = stats.workouts;
+            document.getElementById('streak').textContent = stats.streak + ' days';
+            document.getElementById('displayWeight').textContent = stats.weight || '--';
+            document.getElementById('startWeight').textContent = stats.start || '--';
+            document.getElementById('toGoal').textContent = stats.goal && stats.weight ? (stats.weight - stats.goal).toFixed(1) : '--';
+            
+            // Update journey progress
+            const targetDate = new Date('2026-06-04').getTime();
+            const startDate = new Date('2026-02-05').getTime();
+            const now = new Date().getTime();
+            const percent = Math.min(100, Math.max(0, ((now - startDate) / (targetDate - startDate)) * 100));
+            document.getElementById('journeyProgress').style.width = percent + '%';
+            document.getElementById('journeyProgress').textContent = Math.round(percent) + '% TO FIJI';
+        }
+        
+        function logWorkout() {
+            const type = document.getElementById('workoutType').value;
+            const amount = document.getElementById('workoutAmount').value;
+            
+            if (!type || !amount) {
+                alert('Fill in both fields! No cutting corners! 🔥');
+                return;
+            }
+            
+            stats.workouts++;
+            stats.history.push({ date: new Date().toISOString(), type, amount });
+            saveStats();
+            updateDisplay();
+            
+            // Clear inputs
+            document.getElementById('workoutType').value = '';
+            document.getElementById('workoutAmount').value = '';
+            
+            alert(`🔥 LOGGED: ${type} - ${amount}\n\nTotal workouts: ${stats.workouts}\n\nKeep stacking! 💪`);
+        }
+        
+        function updateWeight() {
+            const current = parseFloat(document.getElementById('currentWeight').value);
+            const goal = parseFloat(document.getElementById('goalWeight').value);
+            
+            if (!current) {
+                alert('Enter your current weight! 📊');
+                return;
+            }
+            
+            if (!stats.start) stats.start = current;
+            stats.weight = current;
+            if (goal) stats.goal = goal;
+            
+            saveStats();
+            updateDisplay();
+            
+            const diff = stats.start - current;
+            const message = diff > 0 ? 
+                `Down ${diff.toFixed(1)} lbs from start! 🔥` : 
+                diff < 0 ? `Up ${Math.abs(diff).toFixed(1)} lbs - adjust and keep going! 💪` : 
+                'Same as start - time to push harder! ⚡';
+            
+            alert(`📊 WEIGHT LOGGED: ${current} lbs\n\n${message}`);
+        }
+        
+        function toggleCheck(el) {
+            el.classList.toggle('checked');
+        }
+        
+        // Initialize
+        updateDisplay();
+        
+        // Random chart bars for demo
+        document.querySelectorAll('.chart-bar').forEach(bar => {
+            bar.style.height = Math.floor(Math.random() * 80 + 10) + '%';
+        });
+        
+        // Console easter egg
+        console.log('%c📊 TRACKER LOADED 📊', 'font-size: 25px; color: #00d4ff;');
+        console.log('%cYour data is stored locally. Keep grinding! 💪', 'font-size: 14px; color: #888;');
+    </script>
+</body>
+</html>

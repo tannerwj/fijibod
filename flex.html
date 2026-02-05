@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪 FLEX MODE | Fiji Bod</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffd700 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial Black', sans-serif;
+            overflow: hidden;
+        }
+        
+        .flex-container {
+            text-align: center;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+        
+        .emoji {
+            font-size: 10rem;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+        
+        .title {
+            font-size: 4rem;
+            color: white;
+            text-shadow: 3px 3px 0 #000, -3px -3px 0 #000;
+            margin: 1rem 0;
+            text-transform: uppercase;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            color: #000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            margin: 1rem 0;
+            font-weight: 800;
+        }
+        
+        .mirror {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8, #c0c0c0);
+            border-radius: 50%;
+            border: 20px solid #gold;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .mirror::before {
+            content: '😎';
+            font-size: 8rem;
+            animation: flexing 1s infinite alternate;
+        }
+        
+        @keyframes flexing {
+            from { transform: scale(1); }
+            to { transform: scale(1.2); }
+        }
+        
+        .mirror-text {
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.8rem;
+            color: #333;
+            font-weight: 800;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .stat {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        
+        .compliment {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 2px 2px 0 #000;
+            margin: 2rem 0;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        .home-link {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: #000;
+            color: #ffd700;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 800;
+            transition: all 0.3s;
+        }
+        
+        .home-link:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .confetti {
+            position: fixed;
+            font-size: 2rem;
+            animation: confetti-fall 3s linear forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="flex-container">
+        <div class="emoji">🏆</div>
+        <h1 class="title">FLEX MODE</h1>
+        <div class="subtitle">You've Earned This Screen</div>
+    </div>
+    
+    <div class="mirror">
+        <span class="mirror-text">LOIN GUD</span>
+    </div>
+    
+    <div class="stats">
+        <div class="stat">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Confidence</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">∞</span>
+            <span class="stat-label">Gains</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">FIJI</span>
+            <span class="stat-label">Ready</span>
+        </div>
+    </div>
+    
+    <div class="compliment" id="compliment">
+        Click for a confidence boost! 💪
+    </div>
+    
+    <a href="index.html" class="home-link">← Back to Normal Mode</a>
+    
+    <script>
+        const compliments = [
+            "You're a absolute UNIT! 💪",
+            "Those gains are ILLEGAL! 🚨",
+            "Mirror manufacturers can't keep up with you! 🪞",
+            "You're not just ready for Fiji, Fiji isn't ready for YOU! 🌴",
+            "Your dedication is inspiring! Keep it up! 🔥",
+            "Beach? More like YOUR runway! 🏖️",
+            "The ocean is jealous of your waves! 🌊",
+            "You're the reason sunscreen was invented! ☀️",
+            "Photographers will be fighting for your photo! 📸",
+            "LEGEND STATUS: ACHIEVED! 👑",
+            "Your future self is SO proud right now! 🥹",
+            "You're not just shredded, you're GRATED! 🧀"
+        ];
+        
+        const emojis = ['💪', '🔥', '🏆', '🌴', '😎', '👑', '⚡', '🎯', '🚀', '💯'];
+        
+        document.body.addEventListener('click', (e) => {
+            // Change compliment
+            const compliment = document.getElementById('compliment');
+            compliment.textContent = compliments[Math.floor(Math.random() * compliments.length)];
+            
+            // Create confetti at click position
+            for (let i = 0; i < 5; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                confetti.style.left = (e.clientX + Math.random() * 100 - 50) + 'px';
+                confetti.style.top = e.clientY + 'px';
+                confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        });
+        
+        // Auto confetti on load
+        setInterval(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.top = '-50px';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3000);
+        }, 500);
+        
+        console.log('%c💪 FLEX MODE ACTIVATED 💪', 'font-size: 30px; color: #ffd700;');
+        console.log('%cYou found the secret flex zone! You deserve it.', 'font-size: 14px; color: #ff6b35;');
+        console.log('%cClick anywhere for compliments!', 'font-size: 12px; color: #fff;');
+    </script>
+</body>
+</html>
