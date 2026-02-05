@@ -445,9 +445,16 @@
             }
             
             try {
-                // Create/update user with weight
-                const res = await fetch(`${API_URL}/api/users`, {
+                // First ensure user exists
+                const createRes = await fetch(`${API_URL}/api/users`, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: userName })
+                });
+                
+                // Now update weight using PUT
+                const updateRes = await fetch(`${API_URL}/api/users`, {
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         name: userName, 
@@ -456,21 +463,29 @@
                     })
                 });
                 
-                const data = await res.json();
+                const data = await updateRes.json();
                 
-                if (data.success || data.error === 'Name already taken') {
+                if (data.success) {
                     document.getElementById('currentWeight').value = '';
                     document.getElementById('goalWeight').value = '';
                     
                     const diff = (data.user?.start_weight || current) - current;
-                    const message = diff > 0 ? 
-                        `Down ${diff.toFixed(1)} lbs! 🔥` : 
-                        diff < 0 ? `Up ${Math.abs(diff).toFixed(1)} lbs` : 'Logged!';
+                    let message = '';
+                    if (diff > 0) {
+                        message = `Down ${diff.toFixed(1)} lbs from start! 🔥`;
+                    } else if (diff < 0) {
+                        message = `Up ${Math.abs(diff).toFixed(1)} lbs - time to lock in! 💪`;
+                    } else {
+                        message = 'Weight logged! First entry recorded. 📊';
+                    }
                     
                     alert(`📊 WEIGHT LOGGED: ${current} lbs\n\n${message}`);
                     loadStats();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to update'));
                 }
             } catch (e) {
+                console.error(e);
                 alert('Failed to update weight. Try again! 📊');
             }
         }
@@ -491,10 +506,43 @@
         // Initialize
         loadStats();
         
-        // Random chart bars for demo
-        document.querySelectorAll('.chart-bar').forEach(bar => {
-            bar.style.height = Math.floor(Math.random() * 80 + 10) + '%';
-        });
+        // Load actual weekly workout data
+        async function loadWeeklyChart() {
+            try {
+                const res = await fetch(`${API_URL}/api/workouts/by-user?user_name=${encodeURIComponent(userName)}`);
+                const workouts = await res.json();
+                
+                // Count workouts per day for last 7 days
+                const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                const dayCounts = [0, 0, 0, 0, 0, 0, 0];
+                const today = new Date();
+                
+                workouts.forEach(w => {
+                    const workoutDate = new Date(w.created_at);
+                    const dayDiff = Math.floor((today - workoutDate) / (1000 * 60 * 60 * 24));
+                    if (dayDiff >= 0 && dayDiff < 7) {
+                        const dayIndex = workoutDate.getDay();
+                        dayCounts[dayIndex]++;
+                    }
+                });
+                
+                // Find max for scaling
+                const maxCount = Math.max(...dayCounts, 1);
+                
+                // Update chart bars
+                const bars = document.querySelectorAll('.chart-bar');
+                bars.forEach((bar, i) => {
+                    const count = dayCounts[i];
+                    const height = Math.max((count / maxCount) * 80, count > 0 ? 10 : 0);
+                    bar.style.height = height + '%';
+                    bar.title = `${count} workout${count !== 1 ? 's' : ''}`;
+                });
+            } catch (e) {
+                console.error('Failed to load weekly chart:', e);
+            }
+        }
+        
+        loadWeeklyChart();
         
         // Add name changer
         const nav = document.querySelector('nav');

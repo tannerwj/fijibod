@@ -448,18 +448,21 @@
         
         <div class="trash-talk">
             <h2>📢 Recent Trash Talk</h2>
-            <div class="trash-message">
-                "Just hit a new PR on bench. Who's catching up? No one? That's what I thought. 💪"
-                <div class="trash-author">— Anonymous Top Performer</div>
+            <div id="trashMessages">
+                <div class="trash-message">
+                    "Just hit a new PR on bench. Who's catching up? No one? That's what I thought. 💪"
+                    <div class="trash-author">— Anonymous Top Performer</div>
+                </div>
+                <div class="trash-message">
+                    "I see some of y'all logging 'rest days' 4 times a week. Rest from what? 🤔"
+                    <div class="trash-author">— The Observant One</div>
+                </div>
+                <div class="trash-message">
+                    "Meal prep Sunday complete. 5 days of gains ready. What did YOU do today?"
+                    <div class="trash-author">— Future Fiji Champion</div>
+                </div>
             </div>
-            <div class="trash-message">
-                "I see some of y'all logging 'rest days' 4 times a week. Rest from what? 🤔"
-                <div class="trash-author">— The Observant One</div>
-            </div>
-            <div class="trash-message">
-                "Meal prep Sunday complete. 5 days of gains ready. What did YOU do today?"
-                <div class="trash-author">— Future Fiji Champion</div>
-            </div>
+            <button class="code-button" onclick="postTrashTalk()" style="margin-top: 1.5rem;">💬 Drop Some Trash Talk</button>
         </div>
         
         <div style="text-align: center; margin: 2rem 0;">
@@ -541,7 +544,7 @@
                                 ${w.current_streak > 7 ? '<span class="streak">🔥 ' + w.current_streak + ' DAYS</span>' : ''}
                             </div>
                             <div class="score">${w.score}</div>
-                            <div class="trend trend-${w.trend}">${trends[w.trend]}</div>
+                            <div class="trend trend-${w.trend}" title="${w.trend_info || 'Trend based on weekly activity'}">${trends[w.trend]}</div>
                         </div>
                     `).join('');
                 }
@@ -553,14 +556,13 @@
                 
                 // Update messages
                 if (messages.length > 0) {
-                    const trashContainer = document.querySelector('.trash-talk');
-                    trashContainer.innerHTML = '<h2>📢 Recent Trash Talk</h2>' +
-                        messages.slice(0, 5).map(m => `
-                            <div class="trash-message">
-                                "${m.message}"
-                                <div class="trash-author">— ${m.user_name}</div>
-                            </div>
-                        `).join('');
+                    const trashContainer = document.getElementById('trashMessages');
+                    trashContainer.innerHTML = messages.slice(0, 5).map(m => `
+                        <div class="trash-message">
+                            "${m.message.replace(/"/g, '&quot;')}"
+                            <div class="trash-author">— ${m.user_name}</div>
+                        </div>
+                    `).join('') || '<p style="opacity: 0.6;">No trash talk yet. Be the first! 💬</p>';
                 }
             } catch (e) {
                 console.error('Failed to load leaderboard:', e);
@@ -621,15 +623,6 @@
         
         // Load on start
         loadLeaderboard();
-        
-        // Add post button
-        const trashTalkSection = document.querySelector('.trash-talk');
-        const postBtn = document.createElement('button');
-        postBtn.className = 'code-button';
-        postBtn.style.marginTop = '1rem';
-        postBtn.textContent = '💬 Drop Some Trash';
-        postBtn.onclick = postTrashTalk;
-        trashTalkSection.appendChild(postBtn);
         
         // Console easter egg
         console.log('%c🏆 FIJI BOD LEADERBOARD 🏆', 'font-size: 25px; color: #ffd700;');

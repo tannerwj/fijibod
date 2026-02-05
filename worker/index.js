@@ -30,9 +30,14 @@ export default {
         return createUser(env.DB, body, corsHeaders);
       }
 
-      if (path.match(/^\/api\/users\/\d+$/) && method === 'GET') {
-        const id = path.split('/')[3];
-        return getUser(env.DB, id, corsHeaders);
+      if (path === '/api/users' && method === 'PUT') {
+        const body = await request.json();
+        return updateUser(env.DB, body, corsHeaders);
+      }
+
+      if (path.match(/^\/api\/users\/[^/]+$/) && method === 'GET') {
+        const name = decodeURIComponent(path.split('/')[3]);
+        return getUserByName(env.DB, name, corsHeaders);
       }
 
       if (path === '/api/workouts' && method === 'GET') {
@@ -46,6 +51,11 @@ export default {
 
       if (path === '/api/workouts/recent' && method === 'GET') {
         return getRecentWorkouts(env.DB, corsHeaders);
+      }
+
+      if (path === '/api/workouts/by-user' && method === 'GET') {
+        const userName = url.searchParams.get('user_name');
+        return getWorkoutsByUser(env.DB, userName, corsHeaders);
       }
 
       if (path === '/api/leaderboard' && method === 'GET') {
@@ -108,12 +118,12 @@ async function getUsers(db, headers) {
   return new Response(JSON.stringify(results), { headers });
 }
 
-async function getUser(db, id, headers) {
-  const { results } = await db.prepare('SELECT * FROM users WHERE id = ?').bind(id).all();
-  if (results.length === 0) {
+async function getUserByName(db, name, headers) {
+  const user = await db.prepare('SELECT * FROM users WHERE name = ?').bind(name).first();
+  if (!user) {
     return new Response(JSON.stringify({ error: 'User not found' }), { status: 404, headers });
   }
-  return new Response(JSON.stringify(results[0]), { headers });
+  return new Response(JSON.stringify(user), { headers });
 }
 
 async function createUser(db, body, headers) {
@@ -126,13 +136,55 @@ async function createUser(db, body, headers) {
       'INSERT INTO users (name, start_weight, goal_weight) VALUES (?, ?, ?)'
     ).bind(body.name, body.start_weight || null, body.goal_weight || null).run();
     
-    return new Response(JSON.stringify({ success, name: body.name }), { headers });
+    const user = await db.prepare('SELECT * FROM users WHERE name = ?').bind(body.name).first();
+    return new Response(JSON.stringify({ success, name: body.name, user }), { headers });
   } catch (e) {
     if (e.message.includes('UNIQUE')) {
-      return new Response(JSON.stringify({ error: 'Name already taken' }), { status: 409, headers });
+      // Return existing user
+      const user = await db.prepare('SELECT * FROM users WHERE name = ?').bind(body.name).first();
+      return new Response(JSON.stringify({ success: true, name: body.name, user, existing: true }), { headers });
     }
     throw e;
   }
+}
+
+async function updateUser(db, body, headers) {
+  if (!body.name) {
+    return new Response(JSON.stringify({ error: 'Name required' }), { status: 400, headers });
+  }
+  
+  let user = await db.prepare('SELECT * FROM users WHERE name = ?').bind(body.name).first();
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'User not found' }), { status: 404, headers });
+  }
+  
+  // Build update query dynamically
+  const updates = [];
+  const values = [];
+  
+  if (body.current_weight !== undefined) {
+    updates.push('current_weight = ?');
+    values.push(body.current_weight);
+    // Set start_weight if not already set
+    if (user.start_weight === null) {
+      updates.push('start_weight = ?');
+      values.push(body.current_weight);
+    }
+  }
+  if (body.goal_weight !== undefined) {
+    updates.push('goal_weight = ?');
+    values.push(body.goal_weight);
+  }
+  
+  if (updates.length === 0) {
+    return new Response(JSON.stringify({ error: 'No fields to update' }), { status: 400, headers });
+  }
+  
+  values.push(user.id);
+  await db.prepare(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`).bind(...values).run();
+  
+  user = await db.prepare('SELECT * FROM users WHERE id = ?').bind(user.id).first();
+  return new Response(JSON.stringify({ success: true, user }), { headers });
 }
 
 // Workout operations
@@ -154,6 +206,27 @@ async function getRecentWorkouts(db, headers) {
     ORDER BY w.created_at DESC 
     LIMIT 10
   `).all();
+  return new Response(JSON.stringify(results), { headers });
+}
+
+async function getWorkoutsByUser(db, userName, headers) {
+  if (!userName) {
+    return new Response(JSON.stringify({ error: 'user_name required' }), { status: 400, headers });
+  }
+  
+  const user = await db.prepare('SELECT id FROM users WHERE name = ?').bind(userName).first();
+  if (!user) {
+    return new Response(JSON.stringify([]), { headers });
+  }
+  
+  const { results } = await db.prepare(`
+    SELECT w.*, u.name as user_name 
+    FROM workouts w 
+    JOIN users u ON w.user_id = u.id 
+    WHERE w.user_id = ?
+    ORDER BY w.created_at DESC
+  `).bind(user.id).all();
+  
   return new Response(JSON.stringify(results), { headers });
 }
 
@@ -206,17 +279,26 @@ async function getLeaderboard(db, headers) {
       u.total_points as score,
       u.total_workouts,
       u.current_streak,
-      (SELECT COUNT(*) FROM workouts WHERE user_id = u.id AND created_at > date('now', '-7 days')) as trend
+      (SELECT COUNT(*) FROM workouts WHERE user_id = u.id AND created_at > date('now', '-7 days')) as this_week,
+      (SELECT COUNT(*) FROM workouts WHERE user_id = u.id AND created_at > date('now', '-14 days') AND created_at <= date('now', '-7 days')) as last_week
     FROM users u
+    WHERE u.total_workouts > 0
     ORDER BY u.total_points DESC
   `).all();
   
-  // Add ranks and format
-  const ranked = results.map((u, i) => ({
-    ...u,
-    rank: i + 1,
-    trend: u.trend > 2 ? 'up' : u.trend > 0 ? 'same' : 'down'
-  }));
+  // Add ranks and calculate trend (comparing this week vs last week)
+  const ranked = results.map((u, i) => {
+    let trend = 'same';
+    if (u.this_week > u.last_week) trend = 'up';
+    else if (u.this_week < u.last_week) trend = 'down';
+    
+    return {
+      ...u,
+      rank: i + 1,
+      trend,
+      trend_info: `${u.this_week} this week vs ${u.last_week} last week`
+    };
+  });
   
   return new Response(JSON.stringify(ranked), { headers });
 }
