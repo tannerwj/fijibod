@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     start_weight REAL,
     current_weight REAL,
     goal_weight REAL,
+    goal_type TEXT DEFAULT 'lose', -- 'lose', 'gain', 'maintain'
     total_points INTEGER DEFAULT 0
 );
 
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS messages (
     user_id INTEGER NOT NULL,
     message TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

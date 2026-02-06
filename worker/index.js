@@ -49,6 +49,18 @@ export default {
         return logWorkout(env.DB, body, corsHeaders);
       }
 
+      if (path.match(/^\/api\/workouts\/\d+$/) && method === 'PUT') {
+        const id = path.split('/')[3];
+        const body = await request.json();
+        return updateWorkout(env.DB, id, body, corsHeaders);
+      }
+
+      if (path.match(/^\/api\/workouts\/\d+$/) && method === 'DELETE') {
+        const id = path.split('/')[3];
+        const userName = url.searchParams.get('user_name');
+        return deleteWorkout(env.DB, id, userName, corsHeaders);
+      }
+
       if (path === '/api/workouts/recent' && method === 'GET') {
         return getRecentWorkouts(env.DB, corsHeaders);
       }
@@ -93,6 +105,18 @@ export default {
         return postMessage(env.DB, body, corsHeaders);
       }
 
+      if (path.match(/^\/api\/messages\/\d+$/) && method === 'PUT') {
+        const id = path.split('/')[3];
+        const body = await request.json();
+        return updateMessage(env.DB, id, body, corsHeaders);
+      }
+
+      if (path.match(/^\/api\/messages\/\d+$/) && method === 'DELETE') {
+        const id = path.split('/')[3];
+        const userName = url.searchParams.get('user_name');
+        return deleteMessage(env.DB, id, userName, corsHeaders);
+      }
+
       // Health check
       if (path === '/api/health') {
         return new Response(JSON.stringify({ status: 'ok' }), { headers: corsHeaders });
@@ -133,8 +157,8 @@ async function createUser(db, body, headers) {
   
   try {
     const { success } = await db.prepare(
-      'INSERT INTO users (name, start_weight, goal_weight) VALUES (?, ?, ?)'
-    ).bind(body.name, body.start_weight || null, body.goal_weight || null).run();
+      'INSERT INTO users (name, start_weight, goal_weight, goal_type) VALUES (?, ?, ?, ?)'
+    ).bind(body.name, body.start_weight || null, body.goal_weight || null, body.goal_type || 'lose').run();
     
     const user = await db.prepare('SELECT * FROM users WHERE name = ?').bind(body.name).first();
     return new Response(JSON.stringify({ success, name: body.name, user }), { headers });
@@ -174,6 +198,10 @@ async function updateUser(db, body, headers) {
   if (body.goal_weight !== undefined) {
     updates.push('goal_weight = ?');
     values.push(body.goal_weight);
+  }
+  if (body.goal_type !== undefined) {
+    updates.push('goal_type = ?');
+    values.push(body.goal_type);
   }
   
   if (updates.length === 0) {
@@ -254,7 +282,7 @@ async function logWorkout(db, body, headers) {
   }
 
   // Insert workout
-  await db.prepare(
+  const result = await db.prepare(
     'INSERT INTO workouts (user_id, workout_type, amount, points) VALUES (?, ?, ?, ?)'
   ).bind(user.id, body.workout_type, body.amount, points).run();
 
@@ -262,12 +290,86 @@ async function logWorkout(db, body, headers) {
   await db.prepare(
     'UPDATE users SET total_workouts = total_workouts + 1, total_points = total_points + ? WHERE id = ?'
   ).bind(points, user.id).run();
+  
+  // Get the inserted workout with ID
+  const workout = await db.prepare('SELECT * FROM workouts WHERE id = ?').bind(result.meta.last_row_id).first();
 
   return new Response(JSON.stringify({ 
     success: true, 
-    workout: { user_name: body.user_name, workout_type: body.workout_type, amount: body.amount, points },
-    user
+    workout: { ...workout, user_name: body.user_name },
+    user: await db.prepare('SELECT * FROM users WHERE id = ?').bind(user.id).first()
   }), { headers });
+}
+
+async function updateWorkout(db, id, body, headers) {
+  if (!body.user_name) {
+    return new Response(JSON.stringify({ error: 'user_name required for verification' }), { status: 400, headers });
+  }
+  
+  // Get the workout and verify ownership
+  const workout = await db.prepare('SELECT w.*, u.name as user_name FROM workouts w JOIN users u ON w.user_id = u.id WHERE w.id = ?').bind(id).first();
+  
+  if (!workout) {
+    return new Response(JSON.stringify({ error: 'Workout not found' }), { status: 404, headers });
+  }
+  
+  if (workout.user_name !== body.user_name) {
+    return new Response(JSON.stringify({ error: 'Not authorized to edit this workout' }), { status: 403, headers });
+  }
+  
+  // Build update
+  const updates = [];
+  const values = [];
+  
+  if (body.workout_type) {
+    updates.push('workout_type = ?');
+    values.push(body.workout_type);
+  }
+  if (body.amount) {
+    updates.push('amount = ?');
+    values.push(body.amount);
+    // Recalculate points
+    let points = 10;
+    if (body.amount.includes('reps')) {
+      const num = parseInt(body.amount);
+      if (!isNaN(num)) points = Math.floor(num / 10);
+    }
+    updates.push('points = ?');
+    values.push(points);
+  }
+  
+  if (updates.length === 0) {
+    return new Response(JSON.stringify({ error: 'No fields to update' }), { status: 400, headers });
+  }
+  
+  values.push(id);
+  await db.prepare(`UPDATE workouts SET ${updates.join(', ')} WHERE id = ?`).bind(...values).run();
+  
+  const updated = await db.prepare('SELECT * FROM workouts WHERE id = ?').bind(id).first();
+  return new Response(JSON.stringify({ success: true, workout: updated }), { headers });
+}
+
+async function deleteWorkout(db, id, userName, headers) {
+  if (!userName) {
+    return new Response(JSON.stringify({ error: 'user_name required' }), { status: 400, headers });
+  }
+  
+  // Verify ownership
+  const workout = await db.prepare('SELECT w.*, u.name as user_name FROM workouts w JOIN users u ON w.user_id = u.id WHERE w.id = ?').bind(id).first();
+  
+  if (!workout) {
+    return new Response(JSON.stringify({ error: 'Workout not found' }), { status: 404, headers });
+  }
+  
+  if (workout.user_name !== userName) {
+    return new Response(JSON.stringify({ error: 'Not authorized to delete this workout' }), { status: 403, headers });
+  }
+  
+  // Delete and update user stats
+  await db.prepare('DELETE FROM workouts WHERE id = ?').bind(id).run();
+  await db.prepare('UPDATE users SET total_workouts = total_workouts - 1, total_points = total_points - ? WHERE id = ?').bind(workout.points, workout.user_id).run();
+  
+  return new Response(JSON.stringify({ success: true }), { headers });
 }
 
 // Leaderboard
@@ -310,7 +412,17 @@ async function getStats(db, headers) {
       (SELECT COUNT(*) FROM workouts) as total_workouts,
       (SELECT COUNT(DISTINCT user_id) FROM workouts) as active_users,
       (SELECT MAX(current_streak) FROM users) as longest_streak,
-      (SELECT COALESCE(SUM(CASE WHEN start_weight > current_weight THEN start_weight - current_weight ELSE 0 END), 0) FROM users WHERE current_weight IS NOT NULL) as total_lbs_lost
+      (SELECT 
+        COALESCE(SUM(
+          CASE 
+            WHEN goal_type = 'gain' AND current_weight > start_weight THEN current_weight - start_weight
+            WHEN goal_type = 'lose' AND start_weight > current_weight THEN start_weight - current_weight
+            ELSE 0 
+          END
+        ), 0)
+        FROM users 
+        WHERE current_weight IS NOT NULL AND start_weight IS NOT NULL
+      ) as total_lbs_progress
   `).all();
 
   return new Response(JSON.stringify(stats[0] || {}), { headers });
@@ -415,8 +527,53 @@ async function postMessage(db, body, headers) {
     user = await db.prepare('SELECT * FROM users WHERE name = ?').bind(body.user_name).first();
   }
   
-  await db.prepare('INSERT INTO messages (user_id, message) VALUES (?, ?)')
+  const result = await db.prepare('INSERT INTO messages (user_id, message) VALUES (?, ?)')
     .bind(user.id, body.message).run();
+    
+  const message = await db.prepare('SELECT * FROM messages WHERE id = ?').bind(result.meta.last_row_id).first();
+  
+  return new Response(JSON.stringify({ success: true, message }), { headers });
+}
+
+async function updateMessage(db, id, body, headers) {
+  if (!body.user_name || !body.message) {
+    return new Response(JSON.stringify({ error: 'user_name and message required' }), { status: 400, headers });
+  }
+  
+  // Get the message and verify ownership
+  const msg = await db.prepare('SELECT m.*, u.name as user_name FROM messages m JOIN users u ON m.user_id = u.id WHERE m.id = ?').bind(id).first();
+  
+  if (!msg) {
+    return new Response(JSON.stringify({ error: 'Message not found' }), { status: 404, headers });
+  }
+  
+  if (msg.user_name !== body.user_name) {
+    return new Response(JSON.stringify({ error: 'Not authorized to edit this message' }), { status: 403, headers });
+  }
+  
+  await db.prepare('UPDATE messages SET message = ?, updated_at = datetime("now") WHERE id = ?').bind(body.message, id).run();
+  
+  const updated = await db.prepare('SELECT * FROM messages WHERE id = ?').bind(id).first();
+  return new Response(JSON.stringify({ success: true, message: updated }), { headers });
+}
+
+async function deleteMessage(db, id, userName, headers) {
+  if (!userName) {
+    return new Response(JSON.stringify({ error: 'user_name required' }), { status: 400, headers });
+  }
+  
+  // Verify ownership
+  const msg = await db.prepare('SELECT m.*, u.name as user_name FROM messages m JOIN users u ON m.user_id = u.id WHERE m.id = ?').bind(id).first();
+  
+  if (!msg) {
+    return new Response(JSON.stringify({ error: 'Message not found' }), { status: 404, headers });
+  }
+  
+  if (msg.user_name !== userName) {
+    return new Response(JSON.stringify({ error: 'Not authorized to delete this message' }), { status: 403, headers });
+  }
+  
+  await db.prepare('DELETE FROM messages WHERE id = ?').bind(id).run();
   
   return new Response(JSON.stringify({ success: true }), { headers });
 }

@@ -380,6 +380,53 @@
             margin-bottom: 1rem;
         }
         
+        .edit-btn, .delete-btn {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .edit-btn:hover, .delete-btn:hover {
+            opacity: 1;
+        }
+        
+        .edit-btn {
+            background: var(--ocean);
+            color: white;
+        }
+        
+        .delete-btn {
+            background: #ff4500;
+            color: white;
+        }
+        
+        .goal-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .goal-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .goal-btn.active {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.2);
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             .chart-container { height: 150px; }
@@ -481,6 +528,14 @@
                 <div class="input-group">
                     <label>Goal Weight (lbs)</label>
                     <input type="number" id="goalWeight" placeholder="e.g., 175">
+                </div>
+                <div class="input-group">
+                    <label>Goal Type</label>
+                    <div class="goal-selector">
+                        <button class="goal-btn" id="goalLose" onclick="setGoalType('lose')">Lose</button>
+                        <button class="goal-btn" id="goalGain" onclick="setGoalType('gain')">Gain</button>
+                        <button class="goal-btn" id="goalMaintain" onclick="setGoalType('maintain')">Maintain</button>
+                    </div>
                 </div>
                 <button class="log-button" onclick="updateWeight()">UPDATE 📊</button>
                 
@@ -676,8 +731,27 @@
                     document.getElementById('streak').textContent = (user.current_streak || 0) + ' days';
                     document.getElementById('displayWeight').textContent = user.current_weight || '--';
                     document.getElementById('startWeight').textContent = user.start_weight || '--';
-                    document.getElementById('toGoal').textContent = user.goal_weight && user.current_weight ? 
-                        (user.current_weight - user.goal_weight).toFixed(1) : '--';
+                    
+                    // Calculate progress based on goal type
+                    if (user.goal_weight && user.current_weight) {
+                        let toGoal;
+                        if (user.goal_type === 'gain') {
+                            toGoal = user.goal_weight - user.current_weight;
+                        } else if (user.goal_type === 'lose') {
+                            toGoal = user.current_weight - user.goal_weight;
+                        } else {
+                            toGoal = user.current_weight - user.goal_weight;
+                        }
+                        const sign = toGoal > 0 ? '+' : '';
+                        document.getElementById('toGoal').textContent = sign + toGoal.toFixed(1) + ' lbs';
+                    } else {
+                        document.getElementById('toGoal').textContent = '--';
+                    }
+                    
+                    // Set goal type button
+                    if (user.goal_type) {
+                        setGoalType(user.goal_type);
+                    }
                 }
                 
                 // Load global stats
@@ -738,14 +812,15 @@
             }
             
             try {
-                // Now update weight using PUT
+                // Now update weight using PUT with goal type
                 const updateRes = await fetch(`${API_URL}/api/users`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         name: userName, 
                         current_weight: current,
-                        goal_weight: goal || null
+                        goal_weight: goal || null,
+                        goal_type: currentGoalType
                     })
                 });
                 
@@ -753,19 +828,22 @@
                 
                 if (data.success) {
                     document.getElementById('currentWeight').value = '';
-                    document.getElementById('goalWeight').value = '';
+                    document.getElementById('goalGoal').value = '';
                     
-                    const diff = (data.user?.start_weight || current) - current;
+                    const goalLabel = currentGoalType === 'gain' ? 'gain' : currentGoalType === 'lose' ? 'lose' : 'maintain';
+                    const diff = Math.abs((data.user?.start_weight || current) - current);
+                    const direction = (data.user?.start_weight || current) > current ? 'Down' : 'Up';
+                    
                     let message = '';
-                    if (diff > 0) {
+                    if (currentGoalType === 'gain') {
+                        message = `Up ${diff.toFixed(1)} lbs from start! Keep growing! 💪`;
+                    } else if (currentGoalType === 'lose') {
                         message = `Down ${diff.toFixed(1)} lbs from start! 🔥`;
-                    } else if (diff < 0) {
-                        message = `Up ${Math.abs(diff).toFixed(1)} lbs - time to lock in! 💪`;
                     } else {
-                        message = 'Weight logged! First entry recorded. 📊';
+                        message = `Weight stable at ${current} lbs. Good work maintaining! 📊`;
                     }
                     
-                    showAlert('📊', 'Weight Logged!', `${current} lbs<br><br>${message}`);
+                    showAlert('📊', 'Weight Logged!', `Goal: ${goalLabel} | ${current} lbs<br><br>${message}`);
                     loadAll();
                 } else {
                     showAlert('❌', 'Error', data.error || 'Failed to update weight');
@@ -833,17 +911,96 @@
                     const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                     return `
-                        <div class="workout-entry">
+                        <div class="workout-entry" data-id="${w.id}">
                             <div>
                                 <div class="workout-entry-type">${w.workout_type}</div>
                                 <div class="workout-entry-date">${dateStr} at ${timeStr}</div>
                             </div>
-                            <div style="font-weight: 600; color: var(--gold);">${w.amount}</div>
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-weight: 600; color: var(--gold);">${w.amount}</span>
+                                <button class="edit-btn" onclick="editWorkout(${w.id}, '${w.workout_type.replace(/'/g, "\\'")}', '${w.amount.replace(/'/g, "\\'")}')">✏️</button>
+                                <button class="delete-btn" onclick="deleteWorkout(${w.id})">🗑️</button>
+                            </div>
                         </div>
                     `;
                 }).join('');
             } catch (e) {
                 console.error('Failed to load workout history:', e);
+            }
+        }
+        
+        // Edit workout
+        async function editWorkout(id, currentType, currentAmount) {
+            const newType = prompt('Edit workout type:', currentType);
+            if (!newType) return;
+            
+            const newAmount = prompt('Edit amount:', currentAmount);
+            if (!newAmount) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/api/workouts/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_name: userName,
+                        workout_type: newType,
+                        amount: newAmount
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('✅', 'Updated!', 'Workout updated successfully');
+                    loadAll();
+                } else {
+                    showAlert('❌', 'Error', data.error || 'Failed to update');
+                }
+            } catch (e) {
+                showAlert('❌', 'Error', 'Failed to update workout');
+            }
+        }
+        
+        // Delete workout
+        async function deleteWorkout(id) {
+            showConfirm('🗑️', 'Delete Workout?', 'Are you sure you want to delete this workout?', async () => {
+                try {
+                    const res = await fetch(`${API_URL}/api/workouts/${id}?user_name=${encodeURIComponent(userName)}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const data = await res.json();
+                    if (data.success) {
+                        showAlert('🗑️', 'Deleted', 'Workout removed');
+                        loadAll();
+                    } else {
+                        showAlert('❌', 'Error', data.error || 'Failed to delete');
+                    }
+                } catch (e) {
+                    showAlert('❌', 'Error', 'Failed to delete workout');
+                }
+            });
+        }
+        
+        // Goal type selector
+        let currentGoalType = 'lose';
+        
+        function setGoalType(type) {
+            currentGoalType = type;
+            document.querySelectorAll('.goal-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('goal' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+        }
+        
+        // Initialize goal type from user data
+        async function loadGoalType() {
+            try {
+                const res = await fetch(`${API_URL}/api/users`);
+                const users = await res.json();
+                const user = users.find(u => u.name === userName);
+                if (user && user.goal_type) {
+                    setGoalType(user.goal_type);
+                }
+            } catch (e) {
+                console.error('Failed to load goal type:', e);
             }
         }
         
