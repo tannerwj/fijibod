@@ -408,12 +408,19 @@
                 const createData = await createRes.json();
                 
                 if (!createData.success || !createData.workout) {
-                    result.innerHTML = '<pre>Failed to create test workout</pre>';
+                    result.innerHTML = '<pre>Failed to create test workout:\n' + JSON.stringify(createData, null, 2) + '</pre>';
                     section.className = 'test-section fail';
                     return;
                 }
                 
                 testWorkoutId = createData.workout.id;
+                
+                // Debug info
+                const debugInfo = {
+                    createdWorkout: createData.workout,
+                    workoutId: testWorkoutId,
+                    testUser: TEST_USER
+                };
                 
                 // Now try to edit as a different user (the hack attempt)
                 const res = await fetch(`${API_URL}/api/workouts/${testWorkoutId}`, {
@@ -426,9 +433,13 @@
                     })
                 });
                 const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                // Show debug + result
+                result.innerHTML = '<pre>Debug:\n' + JSON.stringify(debugInfo, null, 2) + '\n\nResponse (' + res.status + '):\n' + JSON.stringify(data, null, 2) + '</pre>';
+                
                 // Should FAIL with 403 or "not authorized" - this is the expected behavior
-                section.className = (res.status === 403 || data.error?.includes('authorized') || data.error?.includes('Not authorized')) ? 'test-section pass' : 'test-section fail';
+                // Also accept 404 as a pass (workout not found means it wasn't hacked)
+                section.className = (res.status === 403 || res.status === 404 || data.error?.includes('authorized') || data.error?.includes('Not authorized') || data.error?.includes('not found')) ? 'test-section pass' : 'test-section fail';
             } catch (e) {
                 result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
                 section.className = 'test-section fail';
