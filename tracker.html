@@ -279,6 +279,93 @@
             animation: pulse 2s infinite;
         }
         
+        .workout-history {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .workout-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .workout-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .workout-entry-date {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .workout-entry-type {
+            font-weight: 600;
+            color: var(--ocean);
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: linear-gradient(135deg, #1a3a52, #0a1628);
+            border: 2px solid var(--ocean);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .modal h3 {
+            color: var(--ocean);
+            margin-bottom: 1rem;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .modal-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        .modal-btn.yes {
+            background: var(--ocean);
+            color: white;
+        }
+        
+        .modal-btn.no {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             .chart-container { height: 150px; }
@@ -294,6 +381,19 @@
         <audio id="audio" loop muted>
             <source src="fiji-ready.mp3" type="audio/mpeg">
         </audio>
+    </div>
+    
+    <!-- Name Conflict Modal -->
+    <div class="modal-overlay" id="nameModal">
+        <div class="modal">
+            <h3>🤔 Name Already in Use</h3>
+            <p>The name "<span id="conflictName"></span>" is already being used by someone else.</p>
+            <p style="margin-top: 1rem; opacity: 0.8;">Is this you?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn yes" onclick="confirmNameYes()">Yes, it's me</button>
+                <button class="modal-btn no" onclick="confirmNameNo()">No, use my initial</button>
+            </div>
+        </div>
     </div>
     
     <div class="container">
@@ -383,6 +483,13 @@
         </div>
         
         <div class="progress-section">
+            <h3 style="text-align: center; margin-bottom: 1rem;">📋 My Workout History</h3>
+            <div class="workout-history" id="workoutHistory">
+                <p style="text-align: center; opacity: 0.6;">No workouts logged yet. Get moving! 💪</p>
+            </div>
+        </div>
+        
+        <div class="progress-section">
             <h3 style="text-align: center; margin-bottom: 1rem;">✅ Daily Checklist</h3>
             <ul class="checklist" id="dailyChecklist">
                 <li onclick="toggleCheck(this)">Workout completed</li>
@@ -401,18 +508,122 @@
         <footer>
             <p>📊 Track it. Stack it. Watch the transformation. 📊</p>
             <p style="margin-top: 0.5rem;"><a href="index.html" style="color: var(--ocean);">← Back to Countdown</a></p>
-        </footer>
-    </div>
-    
     <script src="beta-config.js"></script>
     <script>
         // API_URL loaded from beta-config.js
         
-        // Get or set username
+        // Get or set username with conflict checking
         let userName = localStorage.getItem('fijiUserName');
-        if (!userName) {
-            userName = prompt('Enter your name to start tracking:') || 'Anonymous';
+        let pendingName = null;
+        
+        async function checkNameExists(name) {
+            try {
+                const res = await fetch(`${API_URL}/api/users`);
+                const users = await res.json();
+                return users.find(u => u.name.toLowerCase() === name.toLowerCase());
+            } catch (e) {
+                console.error('Failed to check name:', e);
+                return null;
+            }
+        }
+        
+        async function initUser() {
+            if (!userName) {
+                const enteredName = prompt('Enter your name to start tracking:') || 'Anonymous';
+                const existingUser = await checkNameExists(enteredName);
+                
+                if (existingUser) {
+                    // Show modal asking if it's them
+                    pendingName = enteredName;
+                    document.getElementById('conflictName').textContent = enteredName;
+                    document.getElementById('nameModal').classList.add('active');
+                } else {
+                    // Name is available
+                    userName = enteredName;
+                    localStorage.setItem('fijiUserName', userName);
+                    await createUserIfNeeded();
+                    loadAll();
+                }
+            } else {
+                // Existing user, just load
+                loadAll();
+            }
+        }
+        
+        function confirmNameYes() {
+            // User confirmed it's them
+            document.getElementById('nameModal').classList.remove('active');
+            userName = pendingName;
             localStorage.setItem('fijiUserName', userName);
+            loadAll();
+        }
+        
+        async function confirmNameNo() {
+            // Not them - suggest adding last initial
+            document.getElementById('nameModal').classList.remove('active');
+            const lastInitial = prompt(`The name "${pendingName}" is taken.\n\nEnter your last initial to use "${pendingName} [initial]":`) || 'X';
+            const newName = `${pendingName} ${lastInitial.toUpperCase()}`;
+            
+            // Check if this variant is also taken
+            const existing = await checkNameExists(newName);
+            if (existing) {
+                // Try with a number
+                const finalName = `${newName} ${Math.floor(Math.random() * 100) + 1}`;
+                userName = finalName;
+            } else {
+                userName = newName;
+            }
+            
+            localStorage.setItem('fijiUserName', userName);
+            await createUserIfNeeded();
+            loadAll();
+        }
+        
+        async function createUserIfNeeded() {
+            try {
+                await fetch(`${API_URL}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: userName })
+                });
+            } catch (e) {
+                console.error('Failed to create user:', e);
+            }
+        }
+        
+        async function changeName() {
+            const newName = prompt('Enter new name:', userName);
+            if (!newName || newName === userName) return;
+            
+            const existingUser = await checkNameExists(newName);
+            if (existingUser) {
+                pendingName = newName;
+                document.getElementById('conflictName').textContent = newName;
+                document.getElementById('nameModal').classList.add('active');
+            } else {
+                userName = newName;
+                localStorage.setItem('fijiUserName', userName);
+                await createUserIfNeeded();
+                loadAll();
+            }
+        }
+        
+        async function loadAll() {
+            loadStats();
+            loadWeeklyChart();
+            loadWorkoutHistory();
+            updateNameDisplay();
+        }
+        
+        function updateNameDisplay() {
+            const nav = document.querySelector('nav');
+            let nameBtn = nav.querySelector('.name-display');
+            if (!nameBtn) {
+                nameBtn = document.createElement('span');
+                nameBtn.className = 'name-display';
+                nav.appendChild(nameBtn);
+            }
+            nameBtn.innerHTML = ' | <a href="#" onclick="changeName(); return false;" style="font-size:0.8rem;opacity:0.6;">Change Name (' + userName + ')</a>';
         }
         
         async function loadStats() {
@@ -469,7 +680,7 @@
                     document.getElementById('workoutType').value = '';
                     document.getElementById('workoutAmount').value = '';
                     alert(`🔥 LOGGED: ${type} - ${amount}\n\n+${data.workout.points} points!\nTotal: ${data.user.total_workouts} workouts\n\nKeep stacking! 💪`);
-                    loadStats();
+                    loadAll();
                 } else {
                     alert('Error: ' + (data.error || 'Failed to log'));
                 }
@@ -488,13 +699,6 @@
             }
             
             try {
-                // First ensure user exists
-                const createRes = await fetch(`${API_URL}/api/users`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: userName })
-                });
-                
                 // Now update weight using PUT
                 const updateRes = await fetch(`${API_URL}/api/users`, {
                     method: 'PUT',
@@ -523,7 +727,7 @@
                     }
                     
                     alert(`📊 WEIGHT LOGGED: ${current} lbs\n\n${message}`);
-                    loadStats();
+                    loadAll();
                 } else {
                     alert('Error: ' + (data.error || 'Failed to update'));
                 }
@@ -536,18 +740,6 @@
         function toggleCheck(el) {
             el.classList.toggle('checked');
         }
-        
-        function changeName() {
-            const newName = prompt('Enter new name:', userName);
-            if (newName) {
-                userName = newName;
-                localStorage.setItem('fijiUserName', userName);
-                loadStats();
-            }
-        }
-        
-        // Initialize
-        loadStats();
         
         // Load actual weekly workout data
         async function loadWeeklyChart() {
@@ -585,17 +777,42 @@
             }
         }
         
-        loadWeeklyChart();
+        // Load workout history
+        async function loadWorkoutHistory() {
+            try {
+                const res = await fetch(`${API_URL}/api/workouts/by-user?user_name=${encodeURIComponent(userName)}`);
+                const workouts = await res.json();
+                const historyDiv = document.getElementById('workoutHistory');
+                
+                if (workouts.length === 0) {
+                    historyDiv.innerHTML = '<p style="text-align: center; opacity: 0.6;">No workouts logged yet. Get moving! 💪</p>';
+                    return;
+                }
+                
+                historyDiv.innerHTML = workouts.map(w => {
+                    const date = new Date(w.created_at);
+                    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    return `
+                        <div class="workout-entry">
+                            <div>
+                                <div class="workout-entry-type">${w.workout_type}</div>
+                                <div class="workout-entry-date">${dateStr} at ${timeStr}</div>
+                            </div>
+                            <div style="font-weight: 600; color: var(--gold);">${w.amount}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('Failed to load workout history:', e);
+            }
+        }
         
-        // Add name changer
-        const nav = document.querySelector('nav');
-        const nameBtn = document.createElement('span');
-        nameBtn.innerHTML = ' | <a href="#" onclick="changeName(); return false;" style="font-size:0.8rem;opacity:0.6;">Change Name (' + userName + ')</a>';
-        nav.appendChild(nameBtn);
+        // Initialize
+        initUser();
         
         // Console easter egg
         console.log('%c📊 TRACKER CONNECTED 📊', 'font-size: 25px; color: #00d4ff;');
-        console.log('%cUser: ' + userName, 'font-size: 14px; color: #888;');
         
         // Audio control
         const audio = document.getElementById('audio');
@@ -620,6 +837,5 @@
                 });
             }
         }
-    </script>
-</body>
+    </script></body>
 </html>
