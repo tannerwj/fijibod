@@ -184,13 +184,11 @@
             color: var(--gold);
         }
         
-        .trend {
+        .workouts {
             text-align: center;
+            font-weight: 600;
+            color: var(--ocean);
         }
-        
-        .trend-up { color: #00ff00; }
-        .trend-down { color: #ff4500; }
-        .trend-same { color: var(--silver); }
         
         .stats-cards {
             display: grid;
@@ -455,7 +453,7 @@
                 <div>Rank</div>
                 <div>Warrior</div>
                 <div>Score</div>
-                <div>Trend</div>
+                <div>Workouts</div>
             </div>
             <div id="leaderboardBody">
                 <!-- Will be populated by JS -->
@@ -540,8 +538,6 @@
     <script src="beta-config.js"></script>
     <script>
         // API_URL loaded from beta-config.js
-        const trends = { up: "📈", down: "📉", same: "➡️" };
-        
         async function loadLeaderboard() {
             try {
                 const [leaderboardRes, statsRes, messagesRes] = await Promise.all([
@@ -576,7 +572,7 @@
                             <div class="rank">-</div>
                             <div class="name">No warriors yet! Be the first to log a workout 💪</div>
                             <div class="score">0</div>
-                            <div class="trend">-</div>
+                            <div class="workouts">-</div>
                         </div>`;
                 } else {
                     body.innerHTML = warriors.map((w, i) => `
@@ -587,7 +583,7 @@
                                 ${w.current_streak > 7 ? '<span class="streak">🔥 ' + w.current_streak + ' DAYS</span>' : ''}
                             </div>
                             <div class="score">${w.score}</div>
-                            <div class="trend trend-${w.trend}" title="${w.trend_info || 'Trend based on weekly activity'}">${trends[w.trend]}</div>
+                            <div class="workouts" style="color: var(--ocean); font-weight: 600;">${w.total_workouts || 0}</div>
                         </div>
                     `).join('');
                 }

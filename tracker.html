@@ -366,6 +366,20 @@
             color: white;
         }
         
+        .alert-modal .modal {
+            background: linear-gradient(135deg, #1a3a52, #0a1628);
+            border: 2px solid var(--ocean);
+        }
+        
+        .alert-modal .modal h3 {
+            color: var(--ocean);
+        }
+        
+        .alert-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             .chart-container { height: 150px; }
@@ -392,6 +406,31 @@
             <div class="modal-buttons">
                 <button class="modal-btn yes" onclick="confirmNameYes()">Yes, it's me</button>
                 <button class="modal-btn no" onclick="confirmNameNo()">No, use my initial</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert Modal -->
+    <div class="modal-overlay alert-modal" id="alertModal">
+        <div class="modal">
+            <div class="alert-icon" id="alertIcon">🔥</div>
+            <h3 id="alertTitle">Notice</h3>
+            <p id="alertMessage">Message goes here</p>
+            <div class="modal-buttons">
+                <button class="modal-btn yes" onclick="closeAlert()">Got it</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirm Modal -->
+    <div class="modal-overlay alert-modal" id="confirmModal">
+        <div class="modal">
+            <div class="alert-icon" id="confirmIcon">❓</div>
+            <h3 id="confirmTitle">Confirm</h3>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn yes" onclick="confirmYes()">Yes</button>
+                <button class="modal-btn no" onclick="closeConfirm()">Cancel</button>
             </div>
         </div>
     </div>
@@ -663,7 +702,7 @@
             const amount = document.getElementById('workoutAmount').value;
             
             if (!type || !amount) {
-                alert('Fill in both fields! No cutting corners! 🔥');
+                showAlert('⚠️', 'Missing Info', 'Fill in both fields! No cutting corners!');
                 return;
             }
             
@@ -679,13 +718,13 @@
                 if (data.success) {
                     document.getElementById('workoutType').value = '';
                     document.getElementById('workoutAmount').value = '';
-                    alert(`🔥 LOGGED: ${type} - ${amount}\n\n+${data.workout.points} points!\nTotal: ${data.user.total_workouts} workouts\n\nKeep stacking! 💪`);
+                    showAlert('🔥', 'Workout Logged!', `${type} - ${amount}<br><br>+${data.workout.points} points!<br>Total: ${data.user.total_workouts} workouts<br><br>Keep stacking! 💪`);
                     loadAll();
                 } else {
-                    alert('Error: ' + (data.error || 'Failed to log'));
+                    showAlert('❌', 'Error', data.error || 'Failed to log workout');
                 }
             } catch (e) {
-                alert('Failed to connect. Try again! 🔥');
+                showAlert('❌', 'Connection Error', 'Failed to connect. Try again!');
             }
         }
         
@@ -694,7 +733,7 @@
             const goal = parseFloat(document.getElementById('goalWeight').value);
             
             if (!current) {
-                alert('Enter your current weight! 📊');
+                showAlert('⚠️', 'Missing Info', 'Enter your current weight!');
                 return;
             }
             
@@ -726,14 +765,14 @@
                         message = 'Weight logged! First entry recorded. 📊';
                     }
                     
-                    alert(`📊 WEIGHT LOGGED: ${current} lbs\n\n${message}`);
+                    showAlert('📊', 'Weight Logged!', `${current} lbs<br><br>${message}`);
                     loadAll();
                 } else {
-                    alert('Error: ' + (data.error || 'Failed to update'));
+                    showAlert('❌', 'Error', data.error || 'Failed to update weight');
                 }
             } catch (e) {
                 console.error(e);
-                alert('Failed to update weight. Try again! 📊');
+                showAlert('❌', 'Connection Error', 'Failed to update weight. Try again!');
             }
         }
         
@@ -814,6 +853,39 @@
         // Console easter egg
         console.log('%c📊 TRACKER CONNECTED 📊', 'font-size: 25px; color: #00d4ff;');
         
+        // Alert modal functions
+        function showAlert(icon, title, message) {
+            document.getElementById('alertIcon').textContent = icon;
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').innerHTML = message;
+            document.getElementById('alertModal').classList.add('active');
+        }
+        
+        function closeAlert() {
+            document.getElementById('alertModal').classList.remove('active');
+        }
+        
+        // Confirm modal functions
+        let confirmCallback = null;
+        
+        function showConfirm(icon, title, message, onYes) {
+            document.getElementById('confirmIcon').textContent = icon;
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').innerHTML = message;
+            confirmCallback = onYes;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+        
+        function confirmYes() {
+            document.getElementById('confirmModal').classList.remove('active');
+            if (confirmCallback) confirmCallback();
+        }
+        
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.remove('active');
+            confirmCallback = null;
+        }
+        
         // Audio control
         const audio = document.getElementById('audio');
         const audioBtn = document.getElementById('audioBtn');
@@ -833,9 +905,10 @@
                     isPlaying = true;
                 }).catch(e => {
                     console.log('Audio play failed:', e);
-                    alert('Click again to enable audio! 🔊');
+                    showAlert('🔊', 'Audio Error', 'Click again to enable audio!');
                 });
             }
         }
-    </script></body>
+    </script>
+</body>
 </html>
