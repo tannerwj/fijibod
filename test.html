@@ -111,8 +111,7 @@
     
     <script src="beta-config.js"></script>
     <script>
-        // Update env badge
-        const isBeta = window.location.hostname.includes('beta');
+        // Update env badge (isBeta already declared in beta-config.js)
         const badge = document.getElementById('envBadge');
         badge.textContent = isBeta ? 'BETA ENV' : 'PRODUCTION';
         badge.className = 'env-badge ' + (isBeta ? 'beta' : 'prod');
