@@ -512,6 +512,30 @@
         </div>
     </div>
     
+    <!-- Edit Workout Modal -->
+    <div class="modal-overlay input-modal" id="editWorkoutModal">
+        <div class="modal" style="max-width: 420px;">
+            <div class="alert-icon">✏️</div>
+            <h3>Edit Workout</h3>
+            <div class="input-group" style="text-align: left; margin: 1rem 0;">
+                <label>Workout Type</label>
+                <input type="text" id="editWorkoutType" placeholder="e.g., Pushups, Running, Weights">
+            </div>
+            <div class="input-group" style="text-align: left; margin: 1rem 0;">
+                <label>Amount (reps / minutes / distance)</label>
+                <input type="text" id="editWorkoutAmount" placeholder="e.g., 50 reps, 30 min, 3 miles">
+            </div>
+            <div class="input-group" style="text-align: left; margin: 1rem 0;">
+                <label>Date</label>
+                <input type="date" id="editWorkoutDate">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn yes" onclick="submitEditWorkout()">Save</button>
+                <button class="modal-btn no" onclick="closeEditWorkout()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Block Modal (for when user needs to enter name) -->
     <div class="modal-overlay alert-modal" id="blockModal">
         <div class="modal">
@@ -592,6 +616,51 @@
                         <span class="stat-value" id="displayWeight">--</span>
                     </div>
                     <div class="stat-row">
+                        <span>To Goal</span>
+                        <span class="stat-value" id="toGoal">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <h3 style="margin-bottom: 1rem;">📈 Weekly Activity</h3>
+            <div class="chart-container">
+                <div class="chart-bar" style="height: 0%;"><span class="chart-label">S</span></div>
+                <div class="chart-bar" style="height: 0%;"><span class="chart-label">M</span></div>
+                <div class="chart-bar" style="height: 0%;"><span class="chart-label">T</span></div>
+                <div class="chart-bar" style="height: 0%;"><span class="chart-label">W</span></div>
+                <div class="chart-bar" style="height: 0%;"><span class="chart-label">T</span></div>
+                <div class="chart-bar" style="height: 0%;"><span class="chart-label">F</span></div>
+                <div class="chart-bar" style="height: 0%;"><span class="chart-label">S</span></div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <h3 style="margin-bottom: 1rem;">🏝️ Journey to Fiji</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="journeyProgress" style="width: 0%;">0% TO FIJI</div>
+            </div>
+            <p style="text-align: center; margin-top: 1rem; opacity: 0.8;">June 4, 2026 — Don't miss it.</p>
+        </div>
+        
+        <div class="tracker-card">
+            <h3>📋 Workout History</h3>
+            <div class="workout-history" id="workoutHistory">
+                <p style="text-align: center; opacity: 0.6;">No workouts logged yet. Get moving! 💪</p>
+            </div>
+        </div>
+        
+        <div class="motivation-quote">
+            "The only bad workout is the one that didn't happen."
+        </div>
+        
+        <footer>
+            <p>Fiji Bod • TaxHawk Fitness Challenge</p>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem;">🌴 Every rep gets you closer to the beach</p>
+        </footer>
+    </div>
+    
     <script src="beta-config.js"></script>
     <script>
         // API_URL loaded from beta-config.js
@@ -949,17 +1018,20 @@
                 
                 historyDiv.innerHTML = workouts.map(w => {
                     const date = new Date(w.created_at);
-                    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    // Escape for JS string
+                    const safeType = w.workout_type.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const safeAmount = w.amount.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const safeDate = w.created_at ? w.created_at.replace(/'/g, "\\'") : '';
                     return `
                         <div class="workout-entry" data-id="${w.id}">
                             <div>
                                 <div class="workout-entry-type">${w.workout_type}</div>
-                                <div class="workout-entry-date">${dateStr} at ${timeStr}</div>
+                                <div class="workout-entry-date">${dateStr}</div>
                             </div>
                             <div style="display: flex; align-items: center;">
                                 <span style="font-weight: 600; color: var(--gold);">${w.amount}</span>
-                                <button class="edit-btn" onclick="editWorkout(${w.id}, '${w.workout_type.replace(/'/g, "\\'")}', '${w.amount.replace(/'/g, "\\'")}')">✏️</button>
+                                <button class="edit-btn" onclick="editWorkout(${w.id}, '${safeType}', '${safeAmount}', '${safeDate}')">✏️</button>
                                 <button class="delete-btn" onclick="deleteWorkout(${w.id})">🗑️</button>
                             </div>
                         </div>
@@ -970,31 +1042,61 @@
             }
         }
         
-        // Edit workout - two-step modal
-        function editWorkout(id, currentType, currentAmount) {
+        let editingWorkoutData = null;
+        
+        // Edit workout - single modal with type, amount, and date
+        function editWorkout(id, currentType, currentAmount, currentDate) {
             editingWorkoutId = id;
-            // Step 1: Edit type
-            showInput('✏️', 'Edit Workout Type', 'e.g., Pushups, Running', currentType, (newType) => {
-                if (!newType) return;
-                // Step 2: Edit amount
-                showInput('✏️', 'Edit Amount', 'e.g., 50 reps, 30 min', currentAmount, (newAmount) => {
-                    if (!newAmount) return;
-                    // Submit the edit
-                    submitWorkoutEdit(id, newType, newAmount);
-                });
-            });
+            editingWorkoutData = { type: currentType, amount: currentAmount, date: currentDate };
+            
+            // Populate the modal fields
+            document.getElementById('editWorkoutType').value = currentType;
+            document.getElementById('editWorkoutAmount').value = currentAmount;
+            
+            // Format date for datetime-local input (YYYY-MM-DDTHH:MM)
+            if (currentDate) {
+                const d = new Date(currentDate);
+                const localIso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                document.getElementById('editWorkoutDate').value = localIso;
+            }
+            
+            document.getElementById('editWorkoutModal').classList.add('active');
         }
         
-        async function submitWorkoutEdit(id, newType, newAmount) {
+        function closeEditWorkout() {
+            document.getElementById('editWorkoutModal').classList.remove('active');
+            editingWorkoutId = null;
+            editingWorkoutData = null;
+        }
+        
+        async function submitEditWorkout() {
+            const newType = document.getElementById('editWorkoutType').value.trim();
+            const newAmount = document.getElementById('editWorkoutAmount').value.trim();
+            const newDate = document.getElementById('editWorkoutDate').value;
+            
+            if (!newType || !newAmount) {
+                showAlert('⚠️', 'Missing Info', 'Fill in both workout type and amount!');
+                return;
+            }
+            
+            document.getElementById('editWorkoutModal').classList.remove('active');
+            
             try {
-                const res = await fetch(`${API_URL}/api/workouts/${id}`, {
+                const body = { 
+                    user_name: userName,
+                    workout_type: newType,
+                    amount: newAmount
+                };
+                
+                // Only include date if it was changed
+                if (newDate) {
+                    body.created_at = newDate;
+                }
+                
+                const res = await fetch(`${API_URL}/api/workouts/${editingWorkoutId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        user_name: userName,
-                        workout_type: newType,
-                        amount: newAmount
-                    })
+                    body: JSON.stringify(body)
                 });
                 
                 const data = await res.json();
@@ -1007,7 +1109,20 @@
             } catch (e) {
                 showAlert('❌', 'Error', 'Failed to update workout');
             }
+            
+            editingWorkoutId = null;
+            editingWorkoutData = null;
         }
+        
+        // Handle Enter key on edit modal inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            const editModal = document.getElementById('editWorkoutModal');
+            if (editModal) {
+                editModal.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') submitEditWorkout();
+                });
+            }
+        });
         
         // Delete workout
         async function deleteWorkout(id) {

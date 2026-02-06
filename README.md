@@ -158,6 +158,12 @@ npx wrangler d1 execute fijibod-beta-db --remote --file=worker/migration.sql
 
 ## 📝 Changelog
 
+### Feb 6, 2026
+- Fixed tracker page structure (was truncated, causing missing workout history)
+- Changed edit workout to single modal with type, amount, and date fields
+- Changed workout history to show date only (no time)
+- Added `created_at` support to workout edit API
+
 ### Feb 5, 2026
 - Added workout edit/delete functionality
 - Added goal type selector (lose/gain/maintain)

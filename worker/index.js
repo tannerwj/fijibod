@@ -337,6 +337,10 @@ async function updateWorkout(db, id, body, headers) {
     updates.push('points = ?');
     values.push(points);
   }
+  if (body.created_at) {
+    updates.push('created_at = ?');
+    values.push(body.created_at);
+  }
   
   if (updates.length === 0) {
     return new Response(JSON.stringify({ error: 'No fields to update' }), { status: 400, headers });

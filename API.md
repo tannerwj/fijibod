@@ -36,9 +36,9 @@ Creates workout, auto-calculates points. Returns workout with ID.
 ### Edit Workout
 ```
 PUT /api/workouts/:id
-Body: { "user_name": "John", "workout_type": "Pullups", "amount": "20 reps" }
+Body: { "user_name": "John", "workout_type": "Pullups", "amount": "20 reps", "created_at": "2026-02-05" }
 ```
-Updates workout type/amount. User must be owner. Recalculates points.
+Updates workout type, amount, and optionally date. User must be owner. Recalculates points.
 
 ### Delete Workout
 ```
