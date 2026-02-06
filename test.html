@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 FIJI BOD TEST SUITE</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1 { color: #ffd700; }
+        .test-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 2px solid transparent;
+        }
+        .test-section.running { border-color: #00d4ff; }
+        .test-section.pass { border-color: #00ff00; }
+        .test-section.fail { border-color: #ff4500; }
+        button {
+            background: linear-gradient(135deg, #ff4500, #ff6b35);
+            border: none;
+            border-radius: 10px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover { transform: scale(1.05); }
+        .result { margin-top: 1rem; padding: 1rem; border-radius: 10px; }
+        .result pre { white-space: pre-wrap; word-break: break-word; }
+        .pass .result { background: rgba(0,255,0,0.1); }
+        .fail .result { background: rgba(255,0,0,0.1); }
+        .env-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 800;
+        }
+        .env-badge.prod { background: #00ff00; color: #000; }
+        .env-badge.beta { background: #ff6b35; color: #fff; }
+    </style>
+</head>
+<body>
+    <div id="envBadge" class="env-badge">Checking...</div>
+    
+    <h1>🧪 Fiji Bod Test Suite</h1>
+    <p>Automated testing for all API endpoints and functionality.</p>
+    
+    <div class="test-section" id="healthTest">
+        <h3>1. Health Check</h3>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div class="result" id="healthResult"></div>
+    </div>
+    
+    <div class="test-section" id="userTest">
+        <h3>2. User Creation</h3>
+        <button onclick="testCreateUser()">Create Test User</button>
+        <div class="result" id="userResult"></div>
+    </div>
+    
+    <div class="test-section" id="workoutTest">
+        <h3>3. Workout Logging</h3>
+        <button onclick="testLogWorkout()">Log Test Workout</button>
+        <div class="result" id="workoutResult"></div>
+    </div>
+    
+    <div class="test-section" id="weightTest">
+        <h3>4. Weight Update</h3>
+        <button onclick="testUpdateWeight()">Update Test Weight</button>
+        <div class="result" id="weightResult"></div>
+    </div>
+    
+    <div class="test-section" id="leaderboardTest">
+        <h3>5. Leaderboard</h3>
+        <button onclick="testLeaderboard()">Fetch Leaderboard</button>
+        <div class="result" id="leaderboardResult"></div>
+    </div>
+    
+    <div class="test-section" id="challengeTest">
+        <h3>6. Active Challenge</h3>
+        <button onclick="testChallenge()">Fetch Challenge</button>
+        <div class="result" id="challengeResult"></div>
+    </div>
+    
+    <div class="test-section" id="statsTest">
+        <h3>7. Global Stats</h3>
+        <button onclick="testStats()">Fetch Stats</button>
+        <div class="result" id="statsResult"></div>
+    </div>
+    
+    <div class="test-section" id="messageTest">
+        <h3>8. Trash Talk</h3>
+        <button onclick="testMessage()">Post Test Message</button>
+        <div class="result" id="messageResult"></div>
+    </div>
+    
+    <div style="text-align: center; margin: 2rem 0;">
+        <button onclick="runAllTests()" style="font-size: 1.2rem; padding: 1.5rem 3rem;">🚀 RUN ALL TESTS</button>
+    </div>
+    
+    <script src="beta-config.js"></script>
+    <script>
+        // Update env badge
+        const isBeta = window.location.hostname.includes('beta');
+        const badge = document.getElementById('envBadge');
+        badge.textContent = isBeta ? 'BETA ENV' : 'PRODUCTION';
+        badge.className = 'env-badge ' + (isBeta ? 'beta' : 'prod');
+        
+        const TEST_USER = 'TestUser_' + Date.now();
+        let testUserId = null;
+        
+        async function testHealth() {
+            const section = document.getElementById('healthTest');
+            const result = document.getElementById('healthResult');
+            section.className = 'test-section running';
+            
+            try {
+                const res = await fetch(`${API_URL}/api/health`);
+                const data = await res.json();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                section.className = 'test-section pass';
+            } catch (e) {
+                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
+                section.className = 'test-section fail';
+            }
+        }
+        
+        async function testCreateUser() {
+            const section = document.getElementById('userTest');
+            const result = document.getElementById('userResult');
+            section.className = 'test-section running';
+            
+            try {
+                const res = await fetch(`${API_URL}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: TEST_USER, start_weight: 200, goal_weight: 180 })
+                });
+                const data = await res.json();
+                if (data.user) testUserId = data.user.id;
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                section.className = data.success || data.existing ? 'test-section pass' : 'test-section fail';
+            } catch (e) {
+                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
+                section.className = 'test-section fail';
+            }
+        }
+        
+        async function testLogWorkout() {
+            const section = document.getElementById('workoutTest');
+            const result = document.getElementById('workoutResult');
+            section.className = 'test-section running';
+            
+            try {
+                const res = await fetch(`${API_URL}/api/workouts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: TEST_USER, workout_type: 'Pushups', amount: '50 reps' })
+                });
+                const data = await res.json();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                section.className = data.success ? 'test-section pass' : 'test-section fail';
+            } catch (e) {
+                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
+                section.className = 'test-section fail';
+            }
+        }
+        
+        async function testUpdateWeight() {
+            const section = document.getElementById('weightTest');
+            const result = document.getElementById('weightResult');
+            section.className = 'test-section running';
+            
+            try {
+                const res = await fetch(`${API_URL}/api/users`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: TEST_USER, current_weight: 195 })
+                });
+                const data = await res.json();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                section.className = data.success ? 'test-section pass' : 'test-section fail';
+            } catch (e) {
+                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
+                section.className = 'test-section fail';
+            }
+        }
+        
+        async function testLeaderboard() {
+            const section = document.getElementById('leaderboardTest');
+            const result = document.getElementById('leaderboardResult');
+            section.className = 'test-section running';
+            
+            try {
+                const res = await fetch(`${API_URL}/api/leaderboard`);
+                const data = await res.json();
+                result.innerHTML = '<pre>' + JSON.stringify(data.slice(0, 3), null, 2) + '</pre>';
+                section.className = Array.isArray(data) ? 'test-section pass' : 'test-section fail';
+            } catch (e) {
+                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
+                section.className = 'test-section fail';
+            }
+        }
+        
+        async function testChallenge() {
+            const section = document.getElementById('challengeTest');
+            const result = document.getElementById('challengeResult');
+            section.className = 'test-section running';
+            
+            try {
+                const res = await fetch(`${API_URL}/api/challenges/active`);
+                const data = await res.json();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                section.className = data.name ? 'test-section pass' : 'test-section fail';
+            } catch (e) {
+                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
+                section.className = 'test-section fail';
+            }
+        }
+        
+        async function testStats() {
+            const section = document.getElementById('statsTest');
+            const result = document.getElementById('statsResult');
+            section.className = 'test-section running';
+            
+            try {
+                const res = await fetch(`${API_URL}/api/stats`);
+                const data = await res.json();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                section.className = 'test-section pass';
+            } catch (e) {
+                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
+                section.className = 'test-section fail';
+            }
+        }
+        
+        async function testMessage() {
+            const section = document.getElementById('messageTest');
+            const result = document.getElementById('messageResult');
+            section.className = 'test-section running';
+            
+            try {
+                const res = await fetch(`${API_URL}/api/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: TEST_USER, message: 'Test message from automated test suite! 🔥' })
+                });
+                const data = await res.json();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                section.className = data.success ? 'test-section pass' : 'test-section fail';
+            } catch (e) {
+                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
+                section.className = 'test-section fail';
+            }
+        }
+        
+        async function runAllTests() {
+            await testHealth();
+            await testCreateUser();
+            await testLogWorkout();
+            await testUpdateWeight();
+            await testLeaderboard();
+            await testChallenge();
+            await testStats();
+            await testMessage();
+            
+            // Summary
+            const passed = document.querySelectorAll('.test-section.pass').length;
+            const failed = document.querySelectorAll('.test-section.fail').length;
+            alert(`🧪 TESTS COMPLETE 🧪\n\n✅ Passed: ${passed}\n❌ Failed: ${failed}\n\nCheck the page for details.`);
+        }
+    </script>
+</body>
+</html>
