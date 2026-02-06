@@ -427,6 +427,23 @@
             background: rgba(255, 215, 0, 0.2);
         }
         
+        .input-modal .modal input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+            margin: 1rem 0;
+            box-sizing: border-box;
+        }
+        
+        .input-modal .modal input:focus {
+            outline: none;
+            border-color: var(--ocean);
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             .chart-container { height: 150px; }
@@ -478,6 +495,32 @@
             <div class="modal-buttons">
                 <button class="modal-btn yes" onclick="confirmYes()">Yes</button>
                 <button class="modal-btn no" onclick="closeConfirm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Input Modal -->
+    <div class="modal-overlay input-modal" id="inputModal">
+        <div class="modal">
+            <div class="alert-icon" id="inputIcon">✏️</div>
+            <h3 id="inputTitle">Enter Info</h3>
+            <input type="text" id="inputField" placeholder="Type here...">
+            <div class="modal-buttons">
+                <button class="modal-btn yes" onclick="submitInput()">OK</button>
+                <button class="modal-btn no" onclick="closeInput()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Block Modal (for when user needs to enter name) -->
+    <div class="modal-overlay alert-modal" id="blockModal">
+        <div class="modal">
+            <div class="alert-icon">👋</div>
+            <h3>Welcome to Fiji Bod!</h3>
+            <input type="text" id="blockInput" placeholder="Enter your name to continue">
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">Required to track your progress</p>
+            <div class="modal-buttons">
+                <button class="modal-btn yes" onclick="submitBlockName()">Get Started</button>
             </div>
         </div>
     </div>
@@ -549,59 +592,6 @@
                         <span class="stat-value" id="displayWeight">--</span>
                     </div>
                     <div class="stat-row">
-                        <span>To Goal</span>
-                        <span class="stat-value" id="toGoal">--</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="progress-section">
-            <h3 style="text-align: center; margin-bottom: 1rem;">📈 Your Progress</h3>
-            
-            <p style="margin-bottom: 0.5rem;">Fiji Journey Progress</p>
-            <div class="progress-bar">
-                <div class="progress-fill" id="journeyProgress" style="width: 0%">0%</div>
-            </div>
-            
-            <p style="margin: 1rem 0 0.5rem;">Weekly Workouts (Last 7 Days)</p>
-            <div class="chart-container" id="weeklyChart">
-                <div class="chart-bar" style="height: 0%"><span class="chart-label">M</span></div>
-                <div class="chart-bar" style="height: 0%"><span class="chart-label">T</span></div>
-                <div class="chart-bar" style="height: 0%"><span class="chart-label">W</span></div>
-                <div class="chart-bar" style="height: 0%"><span class="chart-label">T</span></div>
-                <div class="chart-bar" style="height: 0%"><span class="chart-label">F</span></div>
-                <div class="chart-bar" style="height: 0%"><span class="chart-label">S</span></div>
-                <div class="chart-bar" style="height: 0%"><span class="chart-label">S</span></div>
-            </div>
-        </div>
-        
-        <div class="progress-section">
-            <h3 style="text-align: center; margin-bottom: 1rem;">📋 My Workout History</h3>
-            <div class="workout-history" id="workoutHistory">
-                <p style="text-align: center; opacity: 0.6;">No workouts logged yet. Get moving! 💪</p>
-            </div>
-        </div>
-        
-        <div class="progress-section">
-            <h3 style="text-align: center; margin-bottom: 1rem;">✅ Daily Checklist</h3>
-            <ul class="checklist" id="dailyChecklist">
-                <li onclick="toggleCheck(this)">Workout completed</li>
-                <li onclick="toggleCheck(this)">Ate clean (no junk)</li>
-                <li onclick="toggleCheck(this)">Drank 8+ glasses water</li>
-                <li onclick="toggleCheck(this)">7-8 hours sleep</li>
-                <li onclick="toggleCheck(this)">Logged progress</li>
-            </ul>
-        </div>
-        
-        <div class="motivation-quote">
-            "What gets measured gets managed. What gets managed gets improved."
-            <br><span style="opacity: 0.7; font-size: 0.9rem; font-style: normal;">— The Path to Fiji</span>
-        </div>
-        
-        <footer>
-            <p>📊 Track it. Stack it. Watch the transformation. 📊</p>
-            <p style="margin-top: 0.5rem;"><a href="index.html" style="color: var(--ocean);">← Back to Countdown</a></p>
     <script src="beta-config.js"></script>
     <script>
         // API_URL loaded from beta-config.js
@@ -609,8 +599,14 @@
         // Get or set username with conflict checking
         let userName = localStorage.getItem('fijiUserName');
         let pendingName = null;
+        let inputCallback = null;
+        let inputValue = '';
+        let editingWorkoutId = null;
+        let editingWorkoutField = null;
+        let editingWorkoutCurrent = '';
         
         async function checkNameExists(name) {
+            if (!name) return null;
             try {
                 const res = await fetch(`${API_URL}/api/users`);
                 const users = await res.json();
@@ -623,29 +619,37 @@
         
         async function initUser() {
             if (!userName) {
-                const enteredName = prompt('Enter your name to start tracking:') || 'Anonymous';
-                const existingUser = await checkNameExists(enteredName);
-                
-                if (existingUser) {
-                    // Show modal asking if it's them
-                    pendingName = enteredName;
-                    document.getElementById('conflictName').textContent = enteredName;
-                    document.getElementById('nameModal').classList.add('active');
-                } else {
-                    // Name is available
-                    userName = enteredName;
-                    localStorage.setItem('fijiUserName', userName);
-                    await createUserIfNeeded();
-                    loadAll();
-                }
+                // Show blocking modal - must enter name
+                document.getElementById('blockModal').classList.add('active');
             } else {
                 // Existing user, just load
                 loadAll();
             }
         }
         
+        async function submitBlockName() {
+            const name = document.getElementById('blockInput').value.trim();
+            if (!name) {
+                return; // Don't close, require a name
+            }
+            
+            const existingUser = await checkNameExists(name);
+            if (existingUser) {
+                document.getElementById('blockModal').classList.remove('active');
+                // Show conflict modal
+                pendingName = name;
+                document.getElementById('conflictName').textContent = name;
+                document.getElementById('nameModal').classList.add('active');
+            } else {
+                userName = name;
+                localStorage.setItem('fijiUserName', userName);
+                document.getElementById('blockModal').classList.remove('active');
+                await createUserIfNeeded();
+                loadAll();
+            }
+        }
+        
         function confirmNameYes() {
-            // User confirmed it's them
             document.getElementById('nameModal').classList.remove('active');
             userName = pendingName;
             localStorage.setItem('fijiUserName', userName);
@@ -653,24 +657,22 @@
         }
         
         async function confirmNameNo() {
-            // Not them - suggest adding last initial
             document.getElementById('nameModal').classList.remove('active');
-            const lastInitial = prompt(`The name "${pendingName}" is taken.\n\nEnter your last initial to use "${pendingName} [initial]":`) || 'X';
-            const newName = `${pendingName} ${lastInitial.toUpperCase()}`;
-            
-            // Check if this variant is also taken
-            const existing = await checkNameExists(newName);
-            if (existing) {
-                // Try with a number
-                const finalName = `${newName} ${Math.floor(Math.random() * 100) + 1}`;
-                userName = finalName;
-            } else {
-                userName = newName;
-            }
-            
-            localStorage.setItem('fijiUserName', userName);
-            await createUserIfNeeded();
-            loadAll();
+            // Open input modal for last initial
+            showInput('🔤', 'Add Your Last Initial', pendingName + ' [initial]', '', async (initial) => {
+                if (!initial) initial = 'X';
+                const newName = `${pendingName} ${initial.toUpperCase()}`;
+                const existing = await checkNameExists(newName);
+                if (existing) {
+                    const finalName = `${newName} ${Math.floor(Math.random() * 100) + 1}`;
+                    userName = finalName;
+                } else {
+                    userName = newName;
+                }
+                localStorage.setItem('fijiUserName', userName);
+                await createUserIfNeeded();
+                loadAll();
+            });
         }
         
         async function createUserIfNeeded() {
@@ -686,27 +688,67 @@
         }
         
         async function changeName() {
-            const newName = prompt('Enter new name:', userName);
-            if (!newName || newName === userName) return;
-            
-            const existingUser = await checkNameExists(newName);
-            if (existingUser) {
-                pendingName = newName;
-                document.getElementById('conflictName').textContent = newName;
-                document.getElementById('nameModal').classList.add('active');
-            } else {
-                userName = newName;
-                localStorage.setItem('fijiUserName', userName);
-                await createUserIfNeeded();
-                loadAll();
+            showInput('✏️', 'Change Name', 'Enter new name', userName, async (newName) => {
+                if (!newName || newName === userName) return;
+                
+                const existingUser = await checkNameExists(newName);
+                if (existingUser) {
+                    pendingName = newName;
+                    document.getElementById('conflictName').textContent = newName;
+                    document.getElementById('nameModal').classList.add('active');
+                } else {
+                    userName = newName;
+                    localStorage.setItem('fijiUserName', userName);
+                    await createUserIfNeeded();
+                    loadAll();
+                }
+            });
+        }
+        
+        // Input modal functions
+        function showInput(icon, title, placeholder, currentValue, callback) {
+            document.getElementById('inputIcon').textContent = icon;
+            document.getElementById('inputTitle').textContent = title;
+            const input = document.getElementById('inputField');
+            input.placeholder = placeholder;
+            input.value = currentValue;
+            inputCallback = callback;
+            document.getElementById('inputModal').classList.add('active');
+            setTimeout(() => input.focus(), 100);
+        }
+        
+        function submitInput() {
+            const value = document.getElementById('inputField').value.trim();
+            document.getElementById('inputModal').classList.remove('active');
+            if (inputCallback) {
+                inputCallback(value);
+                inputCallback = null;
             }
         }
+        
+        function closeInput() {
+            document.getElementById('inputModal').classList.remove('active');
+            if (inputCallback) {
+                inputCallback(null);
+                inputCallback = null;
+            }
+        }
+        
+        // Handle Enter key on input
+        document.getElementById('inputField').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitInput();
+        });
+        
+        document.getElementById('blockInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitBlockName();
+        });
         
         async function loadAll() {
             loadStats();
             loadWeeklyChart();
             loadWorkoutHistory();
             updateNameDisplay();
+            loadGoalType();
         }
         
         function updateNameDisplay() {
@@ -828,11 +870,10 @@
                 
                 if (data.success) {
                     document.getElementById('currentWeight').value = '';
-                    document.getElementById('goalGoal').value = '';
+                    document.getElementById('goalWeight').value = '';
                     
                     const goalLabel = currentGoalType === 'gain' ? 'gain' : currentGoalType === 'lose' ? 'lose' : 'maintain';
                     const diff = Math.abs((data.user?.start_weight || current) - current);
-                    const direction = (data.user?.start_weight || current) > current ? 'Down' : 'Up';
                     
                     let message = '';
                     if (currentGoalType === 'gain') {
@@ -929,14 +970,22 @@
             }
         }
         
-        // Edit workout
-        async function editWorkout(id, currentType, currentAmount) {
-            const newType = prompt('Edit workout type:', currentType);
-            if (!newType) return;
-            
-            const newAmount = prompt('Edit amount:', currentAmount);
-            if (!newAmount) return;
-            
+        // Edit workout - two-step modal
+        function editWorkout(id, currentType, currentAmount) {
+            editingWorkoutId = id;
+            // Step 1: Edit type
+            showInput('✏️', 'Edit Workout Type', 'e.g., Pushups, Running', currentType, (newType) => {
+                if (!newType) return;
+                // Step 2: Edit amount
+                showInput('✏️', 'Edit Amount', 'e.g., 50 reps, 30 min', currentAmount, (newAmount) => {
+                    if (!newAmount) return;
+                    // Submit the edit
+                    submitWorkoutEdit(id, newType, newAmount);
+                });
+            });
+        }
+        
+        async function submitWorkoutEdit(id, newType, newAmount) {
             try {
                 const res = await fetch(`${API_URL}/api/workouts/${id}`, {
                     method: 'PUT',
