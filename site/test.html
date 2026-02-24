@@ -14,6 +14,7 @@
             padding: 2rem;
         }
         h1 { color: #ffd700; }
+        h2 { color: #00d4ff; margin-top: 2rem; }
         .test-section {
             background: rgba(255,255,255,0.05);
             border-radius: 15px;
@@ -49,121 +50,250 @@
         }
         .env-badge.prod { background: #00ff00; color: #000; }
         .env-badge.beta { background: #ff6b35; color: #fff; }
+        .summary {
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+            font-size: 1.2rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="envBadge" class="env-badge">Checking...</div>
-    
+
     <h1>🧪 Fiji Bod Test Suite</h1>
     <p>Automated testing for all API endpoints and functionality.</p>
-    
-    <div class="test-section" id="healthTest">
-        <h3>1. Health Check</h3>
-        <button onclick="testHealth()">Test Health Endpoint</button>
-        <div class="result" id="healthResult"></div>
-    </div>
-    
-    <div class="test-section" id="userTest">
-        <h3>2. User Creation</h3>
-        <button onclick="testCreateUser()">Create Test User</button>
-        <div class="result" id="userResult"></div>
-    </div>
-    
-    <div class="test-section" id="workoutTest">
-        <h3>3. Workout Logging</h3>
-        <button onclick="testLogWorkout()">Log Test Workout</button>
-        <div class="result" id="workoutResult"></div>
-    </div>
-    
-    <div class="test-section" id="weightTest">
-        <h3>4. Weight Update</h3>
-        <button onclick="testUpdateWeight()">Update Test Weight</button>
-        <div class="result" id="weightResult"></div>
-    </div>
-    
-    <div class="test-section" id="leaderboardTest">
-        <h3>5. Leaderboard</h3>
-        <button onclick="testLeaderboard()">Fetch Leaderboard</button>
-        <div class="result" id="leaderboardResult"></div>
-    </div>
-    
-    <div class="test-section" id="challengeTest">
-        <h3>6. Active Challenge</h3>
-        <button onclick="testChallenge()">Fetch Challenge</button>
-        <div class="result" id="challengeResult"></div>
-    </div>
-    
-    <div class="test-section" id="statsTest">
-        <h3>7. Global Stats</h3>
-        <button onclick="testStats()">Fetch Stats</button>
-        <div class="result" id="statsResult"></div>
-    </div>
-    
-    <div class="test-section" id="messageTest">
-        <h3>8. Trash Talk</h3>
-        <button onclick="testMessage()">Post Test Message</button>
-        <div class="result" id="messageResult"></div>
-    </div>
-    
-    <div class="test-section" id="editWorkoutTest">
-        <h3>9. Edit Workout</h3>
-        <button onclick="testEditWorkout()">Edit Last Workout</button>
-        <div class="result" id="editWorkoutResult"></div>
-    </div>
-    
-    <div class="test-section" id="deleteWorkoutTest">
-        <h3>10. Delete Workout</h3>
-        <button onclick="testDeleteWorkout()">Delete Last Workout</button>
-        <div class="result" id="deleteWorkoutResult"></div>
-    </div>
-    
-    <div class="test-section" id="goalTypeTest">
-        <h3>11. Goal Type (Gain)</h3>
-        <button onclick="testGoalType()">Set Goal to "Gain"</button>
-        <div class="result" id="goalTypeResult"></div>
-    </div>
-    
-    <div class="test-section" id="unauthorizedTest">
-        <h3>12. Unauthorized Edit Test</h3>
-        <button onclick="testUnauthorizedEdit()">Try Edit as Different User</button>
-        <div class="result" id="unauthorizedResult"></div>
-    </div>
-    
+
+    <div id="summaryBox" class="summary"></div>
+
     <div style="text-align: center; margin: 2rem 0;">
         <button onclick="runAllTests()" style="font-size: 1.2rem; padding: 1.5rem 3rem;">🚀 RUN ALL TESTS</button>
     </div>
-    
+
+    <!-- USERS -->
+    <h2>👤 Users</h2>
+
+    <div class="test-section" id="t-health">
+        <h3>1. Health Check</h3>
+        <button onclick="testHealth()">Run</button>
+        <div class="result" id="r-health"></div>
+    </div>
+
+    <div class="test-section" id="t-createUser">
+        <h3>2. Create User (POST /api/users)</h3>
+        <button onclick="testCreateUser()">Run</button>
+        <div class="result" id="r-createUser"></div>
+    </div>
+
+    <div class="test-section" id="t-getUser">
+        <h3>3. Get User by Name (GET /api/users/:name)</h3>
+        <button onclick="testGetUser()">Run</button>
+        <div class="result" id="r-getUser"></div>
+    </div>
+
+    <div class="test-section" id="t-getAllUsers">
+        <h3>4. Get All Users (GET /api/users)</h3>
+        <button onclick="testGetAllUsers()">Run</button>
+        <div class="result" id="r-getAllUsers"></div>
+    </div>
+
+    <div class="test-section" id="t-updateWeight">
+        <h3>5. Update Weight (PUT /api/users)</h3>
+        <button onclick="testUpdateWeight()">Run</button>
+        <div class="result" id="r-updateWeight"></div>
+    </div>
+
+    <div class="test-section" id="t-goalType">
+        <h3>6. Set Goal Type (PUT /api/users)</h3>
+        <button onclick="testGoalType()">Run</button>
+        <div class="result" id="r-goalType"></div>
+    </div>
+
+    <!-- WORKOUTS -->
+    <h2>💪 Workouts</h2>
+
+    <div class="test-section" id="t-logWorkout">
+        <h3>7. Log Workout (POST /api/workouts)</h3>
+        <button onclick="testLogWorkout()">Run</button>
+        <div class="result" id="r-logWorkout"></div>
+    </div>
+
+    <div class="test-section" id="t-getWorkouts">
+        <h3>8. Get All Workouts (GET /api/workouts)</h3>
+        <button onclick="testGetWorkouts()">Run</button>
+        <div class="result" id="r-getWorkouts"></div>
+    </div>
+
+    <div class="test-section" id="t-recentWorkouts">
+        <h3>9. Recent Workouts (GET /api/workouts/recent)</h3>
+        <button onclick="testRecentWorkouts()">Run</button>
+        <div class="result" id="r-recentWorkouts"></div>
+    </div>
+
+    <div class="test-section" id="t-workoutsByUser">
+        <h3>10. Workouts by User (GET /api/workouts/by-user)</h3>
+        <button onclick="testWorkoutsByUser()">Run</button>
+        <div class="result" id="r-workoutsByUser"></div>
+    </div>
+
+    <div class="test-section" id="t-editWorkout">
+        <h3>11. Edit Workout (PUT /api/workouts/:id)</h3>
+        <button onclick="testEditWorkout()">Run</button>
+        <div class="result" id="r-editWorkout"></div>
+    </div>
+
+    <div class="test-section" id="t-deleteWorkout">
+        <h3>12. Delete Workout (DELETE /api/workouts/:id)</h3>
+        <button onclick="testDeleteWorkout()">Run</button>
+        <div class="result" id="r-deleteWorkout"></div>
+    </div>
+
+    <!-- LEADERBOARD & STATS -->
+    <h2>🏆 Leaderboard & Stats</h2>
+
+    <div class="test-section" id="t-leaderboard">
+        <h3>13. Leaderboard (GET /api/leaderboard)</h3>
+        <button onclick="testLeaderboard()">Run</button>
+        <div class="result" id="r-leaderboard"></div>
+    </div>
+
+    <div class="test-section" id="t-stats">
+        <h3>14. Global Stats (GET /api/stats)</h3>
+        <button onclick="testStats()">Run</button>
+        <div class="result" id="r-stats"></div>
+    </div>
+
+    <div class="test-section" id="t-recalcStreaks">
+        <h3>15. Recalculate Streaks (POST /api/admin/recalculate-streaks)</h3>
+        <button onclick="testRecalcStreaks()">Run</button>
+        <div class="result" id="r-recalcStreaks"></div>
+    </div>
+
+    <!-- CHALLENGES -->
+    <h2>⚔️ Challenges</h2>
+
+    <div class="test-section" id="t-activeChallenge">
+        <h3>16. Active Challenge (GET /api/challenges/active)</h3>
+        <button onclick="testActiveChallenge()">Run</button>
+        <div class="result" id="r-activeChallenge"></div>
+    </div>
+
+    <div class="test-section" id="t-allChallenges">
+        <h3>17. All Challenges / Calendar (GET /api/challenges)</h3>
+        <button onclick="testAllChallenges()">Run</button>
+        <div class="result" id="r-allChallenges"></div>
+    </div>
+
+    <div class="test-section" id="t-joinChallenge">
+        <h3>18. Join Challenge (POST /api/challenge-entries)</h3>
+        <button onclick="testJoinChallenge()">Run</button>
+        <div class="result" id="r-joinChallenge"></div>
+    </div>
+
+    <div class="test-section" id="t-challengeEntries">
+        <h3>19. Get Challenge Entries (GET /api/challenge-entries)</h3>
+        <button onclick="testChallengeEntries()">Run</button>
+        <div class="result" id="r-challengeEntries"></div>
+    </div>
+
+    <!-- MESSAGES -->
+    <h2>💬 Messages</h2>
+
+    <div class="test-section" id="t-postMessage">
+        <h3>20. Post Message (POST /api/messages)</h3>
+        <button onclick="testPostMessage()">Run</button>
+        <div class="result" id="r-postMessage"></div>
+    </div>
+
+    <div class="test-section" id="t-getMessages">
+        <h3>21. Get Messages (GET /api/messages)</h3>
+        <button onclick="testGetMessages()">Run</button>
+        <div class="result" id="r-getMessages"></div>
+    </div>
+
+    <div class="test-section" id="t-editMessage">
+        <h3>22. Edit Message (PUT /api/messages/:id)</h3>
+        <button onclick="testEditMessage()">Run</button>
+        <div class="result" id="r-editMessage"></div>
+    </div>
+
+    <div class="test-section" id="t-deleteMessage">
+        <h3>23. Delete Message (DELETE /api/messages/:id)</h3>
+        <button onclick="testDeleteMessage()">Run</button>
+        <div class="result" id="r-deleteMessage"></div>
+    </div>
+
+    <!-- SECURITY -->
+    <h2>🔒 Security</h2>
+
+    <div class="test-section" id="t-unauthEdit">
+        <h3>24. Unauthorized Workout Edit</h3>
+        <button onclick="testUnauthWorkoutEdit()">Run</button>
+        <div class="result" id="r-unauthEdit"></div>
+    </div>
+
+    <div class="test-section" id="t-unauthDelete">
+        <h3>25. Unauthorized Workout Delete</h3>
+        <button onclick="testUnauthWorkoutDelete()">Run</button>
+        <div class="result" id="r-unauthDelete"></div>
+    </div>
+
+    <div class="test-section" id="t-unauthMsgEdit">
+        <h3>26. Unauthorized Message Edit</h3>
+        <button onclick="testUnauthMsgEdit()">Run</button>
+        <div class="result" id="r-unauthMsgEdit"></div>
+    </div>
+
+    <div class="test-section" id="t-unauthMsgDelete">
+        <h3>27. Unauthorized Message Delete</h3>
+        <button onclick="testUnauthMsgDelete()">Run</button>
+        <div class="result" id="r-unauthMsgDelete"></div>
+    </div>
+
     <script src="beta-config.js"></script>
     <script>
-        // Update env badge (isBeta already declared in beta-config.js)
         const badge = document.getElementById('envBadge');
         badge.textContent = isBeta ? 'BETA ENV' : 'PRODUCTION';
         badge.className = 'env-badge ' + (isBeta ? 'beta' : 'prod');
-        
+
         const TEST_USER = 'TestUser_' + Date.now();
-        let testUserId = null;
-        
+        const HACKER = 'Hacker_' + Date.now();
+        let lastWorkoutId = null;
+        let lastMessageId = null;
+        let activeChallengeId = null;
+
+        // -- Helpers --
+        function show(id, data) {
+            document.getElementById('r-' + id).innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+        function mark(id, pass) {
+            document.getElementById('t-' + id).className = 'test-section ' + (pass ? 'pass' : 'fail');
+        }
+        function run(id) {
+            document.getElementById('t-' + id).className = 'test-section running';
+        }
+        function isAuthError(res, data) {
+            return res.status === 403 || res.status === 404 ||
+                   data.error?.includes('authorized') || data.error?.includes('not found');
+        }
+
+        // ========== USERS ==========
+
         async function testHealth() {
-            const section = document.getElementById('healthTest');
-            const result = document.getElementById('healthResult');
-            section.className = 'test-section running';
-            
+            run('health');
             try {
                 const res = await fetch(`${API_URL}/api/health`);
                 const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = 'test-section pass';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('health', data);
+                mark('health', data.status === 'ok');
+            } catch (e) { show('health', e.message); mark('health', false); }
         }
-        
+
         async function testCreateUser() {
-            const section = document.getElementById('userTest');
-            const result = document.getElementById('userResult');
-            section.className = 'test-section running';
-            
+            run('createUser');
             try {
                 const res = await fetch(`${API_URL}/api/users`, {
                     method: 'POST',
@@ -171,40 +301,33 @@
                     body: JSON.stringify({ name: TEST_USER, start_weight: 200, goal_weight: 180 })
                 });
                 const data = await res.json();
-                if (data.user) testUserId = data.user.id;
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = data.success || data.existing ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('createUser', data);
+                mark('createUser', data.success || data.existing);
+            } catch (e) { show('createUser', e.message); mark('createUser', false); }
         }
-        
-        async function testLogWorkout() {
-            const section = document.getElementById('workoutTest');
-            const result = document.getElementById('workoutResult');
-            section.className = 'test-section running';
-            
+
+        async function testGetUser() {
+            run('getUser');
             try {
-                const res = await fetch(`${API_URL}/api/workouts`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_name: TEST_USER, workout_type: 'Pushups', amount: '50 reps' })
-                });
+                const res = await fetch(`${API_URL}/api/users/${encodeURIComponent(TEST_USER)}`);
                 const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = data.success ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('getUser', data);
+                mark('getUser', data.name === TEST_USER);
+            } catch (e) { show('getUser', e.message); mark('getUser', false); }
         }
-        
+
+        async function testGetAllUsers() {
+            run('getAllUsers');
+            try {
+                const res = await fetch(`${API_URL}/api/users`);
+                const data = await res.json();
+                show('getAllUsers', { count: data.length, sample: data.slice(0, 3).map(u => u.name) });
+                mark('getAllUsers', Array.isArray(data) && data.length > 0);
+            } catch (e) { show('getAllUsers', e.message); mark('getAllUsers', false); }
+        }
+
         async function testUpdateWeight() {
-            const section = document.getElementById('weightTest');
-            const result = document.getElementById('weightResult');
-            section.className = 'test-section running';
-            
+            run('updateWeight');
             try {
                 const res = await fetch(`${API_URL}/api/users`, {
                     method: 'PUT',
@@ -212,89 +335,29 @@
                     body: JSON.stringify({ name: TEST_USER, current_weight: 195 })
                 });
                 const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = data.success ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('updateWeight', data);
+                mark('updateWeight', data.success);
+            } catch (e) { show('updateWeight', e.message); mark('updateWeight', false); }
         }
-        
-        async function testLeaderboard() {
-            const section = document.getElementById('leaderboardTest');
-            const result = document.getElementById('leaderboardResult');
-            section.className = 'test-section running';
-            
+
+        async function testGoalType() {
+            run('goalType');
             try {
-                const res = await fetch(`${API_URL}/api/leaderboard`);
-                const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data.slice(0, 3), null, 2) + '</pre>';
-                section.className = Array.isArray(data) ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
-        }
-        
-        async function testChallenge() {
-            const section = document.getElementById('challengeTest');
-            const result = document.getElementById('challengeResult');
-            section.className = 'test-section running';
-            
-            try {
-                const res = await fetch(`${API_URL}/api/challenges/active`);
-                const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = data.name ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
-        }
-        
-        async function testStats() {
-            const section = document.getElementById('statsTest');
-            const result = document.getElementById('statsResult');
-            section.className = 'test-section running';
-            
-            try {
-                const res = await fetch(`${API_URL}/api/stats`);
-                const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = 'test-section pass';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
-        }
-        
-        async function testMessage() {
-            const section = document.getElementById('messageTest');
-            const result = document.getElementById('messageResult');
-            section.className = 'test-section running';
-            
-            try {
-                const res = await fetch(`${API_URL}/api/messages`, {
-                    method: 'POST',
+                const res = await fetch(`${API_URL}/api/users`, {
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_name: TEST_USER, message: 'Test message from automated test suite! 🔥' })
+                    body: JSON.stringify({ name: TEST_USER, current_weight: 210, goal_weight: 220, goal_type: 'gain' })
                 });
                 const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = data.success ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('goalType', data);
+                mark('goalType', data.success && data.user?.goal_type === 'gain');
+            } catch (e) { show('goalType', e.message); mark('goalType', false); }
         }
-        
-        let lastWorkoutId = null;
-        
+
+        // ========== WORKOUTS ==========
+
         async function testLogWorkout() {
-            const section = document.getElementById('workoutTest');
-            const result = document.getElementById('workoutResult');
-            section.className = 'test-section running';
-            
+            run('logWorkout');
             try {
                 const res = await fetch(`${API_URL}/api/workouts`, {
                     method: 'POST',
@@ -302,168 +365,331 @@
                     body: JSON.stringify({ user_name: TEST_USER, workout_type: 'Pushups', amount: '50 reps' })
                 });
                 const data = await res.json();
-                if (data.success && data.workout) {
-                    lastWorkoutId = data.workout.id;
-                }
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = data.success ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                if (data.success && data.workout) lastWorkoutId = data.workout.id;
+                show('logWorkout', data);
+                mark('logWorkout', data.success);
+            } catch (e) { show('logWorkout', e.message); mark('logWorkout', false); }
         }
-        
+
+        async function testGetWorkouts() {
+            run('getWorkouts');
+            try {
+                const res = await fetch(`${API_URL}/api/workouts`);
+                const data = await res.json();
+                show('getWorkouts', { count: data.length, latest: data.slice(0, 2) });
+                mark('getWorkouts', Array.isArray(data) && data.length > 0);
+            } catch (e) { show('getWorkouts', e.message); mark('getWorkouts', false); }
+        }
+
+        async function testRecentWorkouts() {
+            run('recentWorkouts');
+            try {
+                const res = await fetch(`${API_URL}/api/workouts/recent`);
+                const data = await res.json();
+                show('recentWorkouts', { count: data.length, sample: data.slice(0, 3) });
+                mark('recentWorkouts', Array.isArray(data));
+            } catch (e) { show('recentWorkouts', e.message); mark('recentWorkouts', false); }
+        }
+
+        async function testWorkoutsByUser() {
+            run('workoutsByUser');
+            try {
+                const res = await fetch(`${API_URL}/api/workouts/by-user?user_name=${encodeURIComponent(TEST_USER)}`);
+                const data = await res.json();
+                show('workoutsByUser', data);
+                mark('workoutsByUser', Array.isArray(data) && data.length > 0);
+            } catch (e) { show('workoutsByUser', e.message); mark('workoutsByUser', false); }
+        }
+
         async function testEditWorkout() {
-            const section = document.getElementById('editWorkoutTest');
-            const result = document.getElementById('editWorkoutResult');
-            section.className = 'test-section running';
-            
-            if (!lastWorkoutId) {
-                // Create a workout first
-                await testLogWorkout();
-            }
-            
+            run('editWorkout');
+            if (!lastWorkoutId) await testLogWorkout();
             try {
                 const res = await fetch(`${API_URL}/api/workouts/${lastWorkoutId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        user_name: TEST_USER,
-                        workout_type: 'Pullups',
-                        amount: '20 reps'
-                    })
+                    body: JSON.stringify({ user_name: TEST_USER, workout_type: 'Pullups', amount: '20 reps' })
                 });
                 const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = data.success ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('editWorkout', data);
+                mark('editWorkout', data.success);
+            } catch (e) { show('editWorkout', e.message); mark('editWorkout', false); }
         }
-        
+
         async function testDeleteWorkout() {
-            const section = document.getElementById('deleteWorkoutTest');
-            const result = document.getElementById('deleteWorkoutResult');
-            section.className = 'test-section running';
-            
-            if (!lastWorkoutId) {
-                result.innerHTML = '<pre>No workout to delete. Run workout test first.</pre>';
-                section.className = 'test-section fail';
-                return;
-            }
-            
+            run('deleteWorkout');
+            if (!lastWorkoutId) { show('deleteWorkout', 'No workout to delete'); mark('deleteWorkout', false); return; }
             try {
-                const res = await fetch(`${API_URL}/api/workouts/${lastWorkoutId}?user_name=${encodeURIComponent(TEST_USER)}`, {
-                    method: 'DELETE'
-                });
+                const res = await fetch(`${API_URL}/api/workouts/${lastWorkoutId}?user_name=${encodeURIComponent(TEST_USER)}`, { method: 'DELETE' });
                 const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = data.success ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('deleteWorkout', data);
+                mark('deleteWorkout', data.success);
+                lastWorkoutId = null;
+            } catch (e) { show('deleteWorkout', e.message); mark('deleteWorkout', false); }
         }
-        
-        async function testGoalType() {
-            const section = document.getElementById('goalTypeTest');
-            const result = document.getElementById('goalTypeResult');
-            section.className = 'test-section running';
-            
+
+        // ========== LEADERBOARD & STATS ==========
+
+        async function testLeaderboard() {
+            run('leaderboard');
             try {
-                const res = await fetch(`${API_URL}/api/users`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        name: TEST_USER, 
-                        current_weight: 210,
-                        goal_weight: 220,
-                        goal_type: 'gain'
-                    })
-                });
+                const res = await fetch(`${API_URL}/api/leaderboard`);
                 const data = await res.json();
-                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                section.className = (data.success && data.user.goal_type === 'gain') ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('leaderboard', data.slice(0, 3));
+                mark('leaderboard', Array.isArray(data));
+            } catch (e) { show('leaderboard', e.message); mark('leaderboard', false); }
         }
-        
-        async function testUnauthorizedEdit() {
-            const section = document.getElementById('unauthorizedTest');
-            const result = document.getElementById('unauthorizedResult');
-            section.className = 'test-section running';
-            
-            let testWorkoutId = null;
-            
+
+        async function testStats() {
+            run('stats');
             try {
-                // First, create a fresh workout specifically for this test
-                const createRes = await fetch(`${API_URL}/api/workouts`, {
+                const res = await fetch(`${API_URL}/api/stats`);
+                const data = await res.json();
+                show('stats', data);
+                mark('stats', data.total_workouts !== undefined || data.active_users !== undefined);
+            } catch (e) { show('stats', e.message); mark('stats', false); }
+        }
+
+        async function testRecalcStreaks() {
+            run('recalcStreaks');
+            try {
+                const res = await fetch(`${API_URL}/api/admin/recalculate-streaks`, { method: 'POST' });
+                const data = await res.json();
+                show('recalcStreaks', data);
+                mark('recalcStreaks', data.success);
+            } catch (e) { show('recalcStreaks', e.message); mark('recalcStreaks', false); }
+        }
+
+        // ========== CHALLENGES ==========
+
+        async function testActiveChallenge() {
+            run('activeChallenge');
+            try {
+                const res = await fetch(`${API_URL}/api/challenges/active`);
+                const data = await res.json();
+                if (data.id) activeChallengeId = data.id;
+                show('activeChallenge', data);
+                mark('activeChallenge', !!data.name);
+            } catch (e) { show('activeChallenge', e.message); mark('activeChallenge', false); }
+        }
+
+        async function testAllChallenges() {
+            run('allChallenges');
+            try {
+                const res = await fetch(`${API_URL}/api/challenges`);
+                const data = await res.json();
+                const now = new Date().toISOString().slice(0, 10);
+                const active = data.find(c => now >= c.start_date && now <= c.end_date);
+                show('allChallenges', {
+                    total: data.length,
+                    first: data[0]?.name,
+                    last: data[data.length - 1]?.name,
+                    activeWeek: active ? `Week ${active.week_number}: ${active.name}` : 'None',
+                    dateRange: `${data[0]?.start_date} → ${data[data.length - 1]?.end_date}`
+                });
+                mark('allChallenges', data.length === 17);
+            } catch (e) { show('allChallenges', e.message); mark('allChallenges', false); }
+        }
+
+        async function testJoinChallenge() {
+            run('joinChallenge');
+            if (!activeChallengeId) await testActiveChallenge();
+            try {
+                const res = await fetch(`${API_URL}/api/challenge-entries`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_name: TEST_USER, workout_type: 'SecurityTest', amount: '10 reps' })
-                });
-                const createData = await createRes.json();
-                
-                if (!createData.success || !createData.workout) {
-                    result.innerHTML = '<pre>Failed to create test workout:\n' + JSON.stringify(createData, null, 2) + '</pre>';
-                    section.className = 'test-section fail';
-                    return;
-                }
-                
-                testWorkoutId = createData.workout.id;
-                
-                // Debug info
-                const debugInfo = {
-                    createdWorkout: createData.workout,
-                    workoutId: testWorkoutId,
-                    testUser: TEST_USER
-                };
-                
-                // Now try to edit as a different user (the hack attempt)
-                const res = await fetch(`${API_URL}/api/workouts/${testWorkoutId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        user_name: 'Hacker_' + Date.now(),
-                        workout_type: 'Hacked',
-                        amount: '999 reps'
-                    })
+                    body: JSON.stringify({ user_name: TEST_USER, challenge_id: activeChallengeId, score: 42, notes: 'Test entry' })
                 });
                 const data = await res.json();
-                
-                // Show debug + result
-                result.innerHTML = '<pre>Debug:\n' + JSON.stringify(debugInfo, null, 2) + '\n\nResponse (' + res.status + '):\n' + JSON.stringify(data, null, 2) + '</pre>';
-                
-                // Should FAIL with 403 or "not authorized" - this is the expected behavior
-                // Also accept 404 as a pass (workout not found means it wasn't hacked)
-                section.className = (res.status === 403 || res.status === 404 || data.error?.includes('authorized') || data.error?.includes('Not authorized') || data.error?.includes('not found')) ? 'test-section pass' : 'test-section fail';
-            } catch (e) {
-                result.innerHTML = '<pre>Error: ' + e.message + '</pre>';
-                section.className = 'test-section fail';
-            }
+                show('joinChallenge', data);
+                mark('joinChallenge', data.success);
+            } catch (e) { show('joinChallenge', e.message); mark('joinChallenge', false); }
         }
-        
+
+        async function testChallengeEntries() {
+            run('challengeEntries');
+            if (!activeChallengeId) await testActiveChallenge();
+            try {
+                const res = await fetch(`${API_URL}/api/challenge-entries?challenge_id=${activeChallengeId}`);
+                const data = await res.json();
+                show('challengeEntries', data);
+                mark('challengeEntries', Array.isArray(data));
+            } catch (e) { show('challengeEntries', e.message); mark('challengeEntries', false); }
+        }
+
+        // ========== MESSAGES ==========
+
+        async function testPostMessage() {
+            run('postMessage');
+            try {
+                const res = await fetch(`${API_URL}/api/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: TEST_USER, message: 'Automated test message 🔥' })
+                });
+                const data = await res.json();
+                if (data.success && data.message) lastMessageId = data.message.id;
+                show('postMessage', data);
+                mark('postMessage', data.success);
+            } catch (e) { show('postMessage', e.message); mark('postMessage', false); }
+        }
+
+        async function testGetMessages() {
+            run('getMessages');
+            try {
+                const res = await fetch(`${API_URL}/api/messages`);
+                const data = await res.json();
+                show('getMessages', { count: data.length, latest: data.slice(0, 3) });
+                mark('getMessages', Array.isArray(data) && data.length > 0);
+            } catch (e) { show('getMessages', e.message); mark('getMessages', false); }
+        }
+
+        async function testEditMessage() {
+            run('editMessage');
+            if (!lastMessageId) await testPostMessage();
+            try {
+                const res = await fetch(`${API_URL}/api/messages/${lastMessageId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: TEST_USER, message: 'Edited test message ✏️' })
+                });
+                const data = await res.json();
+                show('editMessage', data);
+                mark('editMessage', data.success);
+            } catch (e) { show('editMessage', e.message); mark('editMessage', false); }
+        }
+
+        async function testDeleteMessage() {
+            run('deleteMessage');
+            if (!lastMessageId) { show('deleteMessage', 'No message to delete'); mark('deleteMessage', false); return; }
+            try {
+                const res = await fetch(`${API_URL}/api/messages/${lastMessageId}?user_name=${encodeURIComponent(TEST_USER)}`, { method: 'DELETE' });
+                const data = await res.json();
+                show('deleteMessage', data);
+                mark('deleteMessage', data.success);
+                lastMessageId = null;
+            } catch (e) { show('deleteMessage', e.message); mark('deleteMessage', false); }
+        }
+
+        // ========== SECURITY ==========
+
+        async function createTestWorkout() {
+            const res = await fetch(`${API_URL}/api/workouts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_name: TEST_USER, workout_type: 'SecurityTest', amount: '10 reps' })
+            });
+            const data = await res.json();
+            return data.success ? data.workout.id : null;
+        }
+
+        async function createTestMessage() {
+            const res = await fetch(`${API_URL}/api/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_name: TEST_USER, message: 'Security test msg' })
+            });
+            const data = await res.json();
+            return data.success ? data.message.id : null;
+        }
+
+        async function testUnauthWorkoutEdit() {
+            run('unauthEdit');
+            try {
+                const wid = await createTestWorkout();
+                if (!wid) { show('unauthEdit', 'Failed to create test workout'); mark('unauthEdit', false); return; }
+                const res = await fetch(`${API_URL}/api/workouts/${wid}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: HACKER, workout_type: 'Hacked', amount: '999' })
+                });
+                const data = await res.json();
+                show('unauthEdit', { workoutId: wid, status: res.status, response: data });
+                mark('unauthEdit', isAuthError(res, data));
+            } catch (e) { show('unauthEdit', e.message); mark('unauthEdit', false); }
+        }
+
+        async function testUnauthWorkoutDelete() {
+            run('unauthDelete');
+            try {
+                const wid = await createTestWorkout();
+                if (!wid) { show('unauthDelete', 'Failed to create test workout'); mark('unauthDelete', false); return; }
+                const res = await fetch(`${API_URL}/api/workouts/${wid}?user_name=${encodeURIComponent(HACKER)}`, { method: 'DELETE' });
+                const data = await res.json();
+                show('unauthDelete', { workoutId: wid, status: res.status, response: data });
+                mark('unauthDelete', isAuthError(res, data));
+            } catch (e) { show('unauthDelete', e.message); mark('unauthDelete', false); }
+        }
+
+        async function testUnauthMsgEdit() {
+            run('unauthMsgEdit');
+            try {
+                const mid = await createTestMessage();
+                if (!mid) { show('unauthMsgEdit', 'Failed to create test message'); mark('unauthMsgEdit', false); return; }
+                const res = await fetch(`${API_URL}/api/messages/${mid}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: HACKER, message: 'Hacked msg' })
+                });
+                const data = await res.json();
+                show('unauthMsgEdit', { messageId: mid, status: res.status, response: data });
+                mark('unauthMsgEdit', isAuthError(res, data));
+            } catch (e) { show('unauthMsgEdit', e.message); mark('unauthMsgEdit', false); }
+        }
+
+        async function testUnauthMsgDelete() {
+            run('unauthMsgDelete');
+            try {
+                const mid = await createTestMessage();
+                if (!mid) { show('unauthMsgDelete', 'Failed to create test message'); mark('unauthMsgDelete', false); return; }
+                const res = await fetch(`${API_URL}/api/messages/${mid}?user_name=${encodeURIComponent(HACKER)}`, { method: 'DELETE' });
+                const data = await res.json();
+                show('unauthMsgDelete', { messageId: mid, status: res.status, response: data });
+                mark('unauthMsgDelete', isAuthError(res, data));
+            } catch (e) { show('unauthMsgDelete', e.message); mark('unauthMsgDelete', false); }
+        }
+
+        // ========== RUN ALL ==========
+
         async function runAllTests() {
+            const box = document.getElementById('summaryBox');
+            box.style.display = 'block';
+            box.innerHTML = '⏳ Running tests...';
+            box.style.borderColor = '#00d4ff';
+
             await testHealth();
             await testCreateUser();
-            await testLogWorkout();
+            await testGetUser();
+            await testGetAllUsers();
             await testUpdateWeight();
-            await testLeaderboard();
-            await testChallenge();
-            await testStats();
-            await testMessage();
+            await testGoalType();
+            await testLogWorkout();
+            await testGetWorkouts();
+            await testRecentWorkouts();
+            await testWorkoutsByUser();
             await testEditWorkout();
             await testDeleteWorkout();
-            await testGoalType();
-            await testUnauthorizedEdit();
-            
-            // Summary
+            await testLeaderboard();
+            await testStats();
+            await testRecalcStreaks();
+            await testActiveChallenge();
+            await testAllChallenges();
+            await testJoinChallenge();
+            await testChallengeEntries();
+            await testPostMessage();
+            await testGetMessages();
+            await testEditMessage();
+            await testDeleteMessage();
+            await testUnauthWorkoutEdit();
+            await testUnauthWorkoutDelete();
+            await testUnauthMsgEdit();
+            await testUnauthMsgDelete();
+
             const passed = document.querySelectorAll('.test-section.pass').length;
             const failed = document.querySelectorAll('.test-section.fail').length;
-            alert(`🧪 TESTS COMPLETE 🧪\n\n✅ Passed: ${passed}\n❌ Failed: ${failed}\n\nCheck the page for details.`);
+            const total = passed + failed;
+            box.innerHTML = `✅ ${passed}/${total} passed` + (failed ? ` &nbsp; ❌ ${failed} failed` : ' &nbsp; 🎉 All clear!');
+            box.style.border = `2px solid ${failed ? '#ff4500' : '#00ff00'}`;
         }
     </script>
 </body>
