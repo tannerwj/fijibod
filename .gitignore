@@ -9,6 +9,9 @@ pnpm-lock.yaml
 wrangler.toml
 wrangler.beta.toml
 
+# Per-user MCP config
+.mcp.json
+
 # Local env files
 .env
 .env.local

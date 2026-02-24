@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "fijibod": {
+      "command": "node",
+      "args": ["mcp/bin/fijibod-mcp.js"],
+      "env": { "FIJIBOD_USER": "YourName" }
+    }
+  }
+}

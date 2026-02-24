@@ -236,6 +236,22 @@
             background: rgba(0, 212, 255, 0.2);
             color: var(--ocean);
         }
+
+        .status-active {
+            background: rgba(255, 69, 0, 0.3);
+            color: var(--fire);
+            animation: pulse 2s infinite;
+        }
+
+        .active-card {
+            border-color: var(--fire) !important;
+            background: rgba(255, 69, 0, 0.08) !important;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
         
         .winner-badge {
             display: inline-block;
@@ -364,7 +380,7 @@
             🔇
         </button>
         <audio id="audio" loop muted>
-            <source src="fiji-ready.mp3" type="audio/mpeg">
+            <source src="audio/fiji-ready.mp3" type="audio/mpeg">
         </audio>
     </div>
     
@@ -417,71 +433,14 @@
         
         <div class="hall-of-fame">
             <h2>👑 Hall of Fame 👑</h2>
-            <p style="text-align: center; margin-bottom: 1.5rem; opacity: 0.8;">
-                Future legends will be etched here
-            </p>
-            <div class="champions">
-                <div class="champion">
-                    <div class="champion-crown">👑</div>
-                    <div class="champion-name">TBD</div>
-                    <div class="champion-title">Week 1 Champion</div>
-                </div>
-                <div class="champion">
-                    <div class="champion-crown">👑</div>
-                    <div class="champion-name">TBD</div>
-                    <div class="champion-title">Week 2 Champion</div>
-                </div>
-                <div class="champion">
-                    <div class="champion-crown">👑</div>
-                    <div class="champion-name">TBD</div>
-                    <div class="champion-title">Week 3 Champion</div>
-                </div>
+            <div class="champions" id="hallOfFame">
+                <p style="opacity:0.6;">Loading champions...</p>
             </div>
         </div>
         
         <div class="past-challenges">
             <h2>📅 Challenge Calendar</h2>
-            
-            <div class="challenge-card winner">
-                <div class="challenge-header">
-                    <span class="challenge-name">🔥 The Great Pushup War</span>
-                    <span class="challenge-status status-upcoming">Week 2</span>
-                </div>
-                <p>Most pushups in 7 days. Variations allowed. Chest to floor or it doesn't count.</p>
-                <span class="winner-badge">👑 Winner TBD</span>
-            </div>
-            
-            <div class="challenge-card">
-                <div class="challenge-header">
-                    <span class="challenge-name">⏱️ Plank Masters</span>
-                    <span class="challenge-status status-upcoming">Week 3</span>
-                </div>
-                <p>Longest cumulative plank time. Core strength showdown. No shaking allowed.</p>
-            </div>
-            
-            <div class="challenge-card">
-                <div class="challenge-header">
-                    <span class="challenge-name">🏃 Step Destroyer</span>
-                    <span class="challenge-status status-upcoming">Week 4</span>
-                </div>
-                <p>Most steps in a week. Walk, run, hike, whatever. Just move.</p>
-            </div>
-            
-            <div class="challenge-card">
-                <div class="challenge-header">
-                    <span class="challenge-name">💪 The 5K Challenge</span>
-                    <span class="challenge-status status-upcoming">Week 5</span>
-                </div>
-                <p>Fastest 5K run. Submit Strava/Garmin proof. Speed kills.</p>
-            </div>
-            
-            <div class="challenge-card">
-                <div class="challenge-header">
-                    <span class="challenge-name">🎯 Perfect Week</span>
-                    <span class="challenge-status status-upcoming">Week 6</span>
-                </div>
-                <p>7 days of workouts, no misses. Consistency is king.</p>
-            </div>
+            <div id="challengeCalendar"><p style="text-align:center;opacity:0.6;">Loading challenges...</p></div>
         </div>
         
         <div class="active-challenge" style="border-color: var(--gold); background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));">
@@ -607,8 +566,70 @@
             }
         }
         
+        // Load challenge calendar
+        async function loadCalendar() {
+            try {
+                const res = await fetch(`${API_URL}/api/challenges`);
+                if (!res.ok) return;
+                const challenges = await res.json();
+                const now = new Date().toISOString().slice(0, 10);
+                const container = document.getElementById('challengeCalendar');
+                const icons = ['🔥','⏱️','🏃','💪','🎯','💣','🦵','💪','❤️','🧱','🦿','⛰️','🚣','🔥','⚡','🏋️','🎖️'];
+
+                container.innerHTML = challenges.map(c => {
+                    const isPast = now > c.end_date;
+                    const isActive = now >= c.start_date && now <= c.end_date;
+                    const statusClass = isActive ? 'status-active' : isPast ? 'status-completed' : 'status-upcoming';
+                    const statusLabel = isActive ? 'Active' : isPast ? 'Completed' : 'Upcoming';
+                    const icon = icons[(c.week_number - 1) % icons.length];
+                    return `<div class="challenge-card${isActive ? ' active-card' : ''}">
+                        <div class="challenge-header">
+                            <span class="challenge-name">${icon} ${c.name}</span>
+                            <span class="challenge-status ${statusClass}">Week ${c.week_number}</span>
+                        </div>
+                        <p>${c.description}</p>
+                        <p style="margin-top:0.5rem;font-size:0.8rem;opacity:0.6;">${c.start_date} → ${c.end_date} &middot; ${statusLabel}</p>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.log('Failed to load calendar:', e);
+            }
+        }
+
+        // Load Hall of Fame — winners of past challenges
+        async function loadHallOfFame() {
+            try {
+                const res = await fetch(`${API_URL}/api/challenges`);
+                if (!res.ok) return;
+                const challenges = await res.json();
+                const now = new Date().toISOString().slice(0, 10);
+                const past = challenges.filter(c => now > c.end_date);
+                if (!past.length) {
+                    document.getElementById('hallOfFame').innerHTML = '<p style="opacity:0.6;">Future legends will be etched here</p>';
+                    return;
+                }
+                const winners = await Promise.all(past.map(async c => {
+                    const r = await fetch(`${API_URL}/api/challenge-entries?challenge_id=${c.id}`);
+                    const entries = r.ok ? await r.json() : [];
+                    const top = entries.length ? entries[0] : null;
+                    return { challenge: c, winner: top };
+                }));
+                document.getElementById('hallOfFame').innerHTML = winners.map(w =>
+                    `<div class="champion">
+                        <div class="champion-crown">👑</div>
+                        <div class="champion-name">${w.winner ? w.winner.user_name : 'No entries'}</div>
+                        <div class="champion-title">Week ${w.challenge.week_number}: ${w.challenge.name}</div>
+                    </div>`
+                ).join('');
+            } catch (e) {
+                console.log('Failed to load hall of fame:', e);
+            }
+        }
+
         // Load on start
         loadChallenge();
+        loadCalendar();
+        loadHallOfFame();
         
         // Console easter egg
         console.log('%c⚔️ CHALLENGE MODE ACTIVATED ⚔️', 'font-size: 30px; color: #ff4500;');

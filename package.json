@@ -1,0 +1,13 @@
+{
+  "name": "fijibod",
+  "private": true,
+  "scripts": {
+    "deploy": "npm run deploy:worker && npm run deploy:pages",
+    "deploy:beta": "npm run deploy:worker:beta && npm run deploy:pages:beta",
+    "deploy:pages": "npx wrangler pages deploy site/ --project-name=fijibod --branch=master",
+    "deploy:pages:beta": "npx wrangler pages deploy site/ --project-name=fijibod-beta --branch=master",
+    "deploy:worker": "npx wrangler deploy",
+    "deploy:worker:beta": "npx wrangler deploy --config wrangler.beta.toml",
+    "mcp": "node mcp/bin/fijibod-mcp.js"
+  }
+}

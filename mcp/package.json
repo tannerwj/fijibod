@@ -1,0 +1,12 @@
+{
+  "name": "fijibod-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "fijibod-mcp": "./bin/fijibod-mcp.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.23.0"
+  }
+}

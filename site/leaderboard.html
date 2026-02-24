@@ -399,7 +399,7 @@
             🔇
         </button>
         <audio id="audio" loop muted>
-            <source src="fiji-ready.mp3" type="audio/mpeg">
+            <source src="audio/fiji-ready.mp3" type="audio/mpeg">
         </audio>
     </div>
     
@@ -590,7 +590,7 @@
                 
                 // Update stats
                 animateValue('totalWorkouts', 0, stats.total_workouts || 0, 2000);
-                animateValue('totalLbs', 0, Math.round(stats.total_lbs_lost || 0), 2000);
+                animateValue('totalLbs', 0, Math.round(stats.total_lbs_progress || 0), 2000);
                 animateValue('topStreak', 0, stats.longest_streak || 0, 2000);
                 
                 // Update messages

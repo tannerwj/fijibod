@@ -1,10 +1,10 @@
-# 🌴 Fiji Bod
+# Fiji Bod
 
 **TaxHawk's official pre-Fiji fitness motivation hub.**
 
 Built for the TaxHawk Engineering team trip to Fiji on June 4, 2026. A friendly competition to see who can get their "Fiji Body" ready in time.
 
-## 🚀 Live Sites
+## Live Sites
 
 | Environment | URL |
 |-------------|-----|
@@ -12,173 +12,145 @@ Built for the TaxHawk Engineering team trip to Fiji on June 4, 2026. A friendly 
 | **Beta** | https://beta.fijibod.com |
 | **Test Suite** | https://beta.fijibod.com/test.html |
 
-## 📁 Pages
+## Project Structure
 
-| Page | Description |
-|------|-------------|
-| `index.html` | Main countdown + navigation |
-| `motivation.html` | Six-pack motivation, truth bombs, roasts, Excuse Destroyer 3000 |
-| `leaderboard.html` | Live rankings, achievements, trash talk, weekly trends |
-| `challenge.html` | Weekly fitness challenges with scoring |
-| `tracker.html` | Personal workout logging, weight tracking, goal setting |
-| `shred.html` | 🔥 Secret motivation page |
-| `test.html` | 🧪 Automated API test suite (beta only) |
+```
+fijibod/
+  package.json            # deploy scripts
+  wrangler.toml           # prod worker config
+  wrangler.beta.toml      # beta worker config
+  site/                   # static frontend (Cloudflare Pages)
+    index.html            # main countdown + navigation
+    leaderboard.html      # live rankings, trash talk, trends
+    tracker.html          # personal workout logging
+    challenge.html        # weekly fitness challenges
+    motivation.html       # motivation + Excuse Destroyer 3000
+    flex.html             # flex gallery
+    shred.html            # secret motivation page
+    test.html             # automated API test suite
+    404.html
+    beta-config.js
+    audio/
+      fiji-ready.mp3
+      excuse-destroyer.mp3
+  worker/                 # Cloudflare Worker API
+    index.js              # router (~70 lines)
+    routes/               # domain handlers
+    lib/                  # shared helpers (cors, response, streaks, points)
+    migrations/           # SQL schema + migrations
+  mcp/                    # MCP server for Claude Code/Desktop
+    bin/fijibod-mcp.js    # entry point
+    src/                  # server + tools
+```
 
-## 🎯 Features
+## Features
 
 ### Personal Tracking
-- ✅ Log workouts (type, reps/duration, points)
-- ✅ Edit/delete your own workouts
-- ✅ Weight tracking with goal types (lose/gain/maintain)
-- ✅ Personal workout history with timestamps
-- ✅ Weekly workout chart
-- ✅ Goal progress visualization
+- Log workouts (type, reps/duration, points)
+- Edit/delete your own workouts
+- Weight tracking with goal types (lose/gain/maintain)
+- Personal workout history with charts
+- Goal progress visualization
 
 ### Social & Competition
-- ✅ Live leaderboard with rankings
-- ✅ Achievement unlocks
-- ✅ Weekly challenges with scoring
-- ✅ Trash talk / messaging
-- ✅ Streak tracking
-- ✅ Team progress stats
+- Live leaderboard with rankings
+- Achievement unlocks
+- Weekly challenges with scoring
+- Trash talk / messaging
+- Streak tracking
+- Team progress stats
 
-### User Experience
-- ✅ Name uniqueness enforcement with conflict resolution
-- ✅ Styled modals (no browser alerts/prompts)
-- ✅ Audio player (Fiji Vibes on most pages, Excuse Destroyer on motivation)
-- ✅ Mobile responsive
-- ✅ Real-time countdown to June 4, 2026
-- ✅ Dark theme with ocean vibes
+### Easter Eggs
+- **Konami Code**: on homepage activates SHRED MODE
+- **Hidden Palms**: three palms hidden on the homepage
+- **Secret Code**: unlocks hidden panel on the leaderboard
+- **Console Messages**: check the browser console on every page
 
-## 🥚 Easter Eggs
+## MCP Server
 
-- **Konami Code**: ↑↑↓↓←→←→ on homepage activates SHRED MODE 🔥
-- **Hidden Palms**: Three 🌴 hidden on the homepage (click them all!)
-- **Secret Code**: Find the code to unlock the hidden panel on the leaderboard
-- **Console Messages**: Check the browser console on every page
-- **Title Click**: Click the FIJI BOD title for random motivation
+Log workouts, check the leaderboard, and trash talk — all from Claude Code or Claude Desktop.
 
-## 🛠️ Tech Stack
+### Setup
 
-### Frontend
-- Pure HTML/CSS/JS (no build step)
-- Responsive design
-- Styled modals (no native browser prompts)
-
-### Backend
-- Cloudflare Pages (static hosting)
-- Cloudflare Worker API (`fijibod-api` / `fijibod-beta-api`)
-- D1 Database (SQLite)
-- Separate prod/beta environments
-
-### Database Schema
-- `users` - profiles, goals, stats, streaks
-- `workouts` - exercise logs with edit history
-- `challenges` - weekly competitions
-- `challenge_entries` - scores
-- `messages` - trash talk
-
-## 🔌 API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/health` | GET | Health check |
-| `/api/users` | GET, POST, PUT | User management |
-| `/api/workouts` | GET, POST | Log workouts |
-| `/api/workouts/:id` | PUT, DELETE | Edit/delete workouts |
-| `/api/workouts/by-user` | GET | Personal history |
-| `/api/leaderboard` | GET | Rankings |
-| `/api/stats` | GET | Global stats |
-| `/api/challenges` | GET | List challenges |
-| `/api/challenges/active` | GET | Current challenge |
-| `/api/challenge-entries` | GET, POST | Challenge scores |
-| `/api/messages` | GET, POST | Trash talk |
-| `/api/messages/:id` | PUT, DELETE | Edit/delete messages |
-
-## 🧪 Testing
-
-The beta environment includes an automated test suite at `/test.html` covering:
-
-1. Health check
-2. User creation
-3. Workout logging
-4. Weight updates
-5. Leaderboard fetch
-6. Active challenge
-7. Global stats
-8. Trash talk posting
-9. **Edit workout** ✨
-10. **Delete workout** ✨
-11. **Goal type setting** ✨
-12. **Unauthorized access prevention** ✨
-
-## 🚀 Deployment
-
-### Production
 ```bash
-cd ~/repos/fijibod
-npx wrangler pages deploy . --project-name=fijibod --branch=master
+cd mcp && npm install
 ```
 
-### Beta
+Add to your Claude Code `.mcp.json` or Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "fijibod": {
+      "command": "node",
+      "args": ["/path/to/fijibod/mcp/bin/fijibod-mcp.js"],
+      "env": { "FIJIBOD_USER": "YourName" }
+    }
+  }
+}
+```
+
+`FIJIBOD_USER` is **required**. Override the API URL with `FIJIBOD_API_URL` if needed.
+
+### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `log_workout` | Log a workout (type + amount) |
+| `get_my_workouts` | Get your workout history |
+| `edit_workout` | Edit a workout |
+| `delete_workout` | Delete a workout |
+| `get_recent_workouts` | Get 10 most recent across all users |
+| `get_leaderboard` | Get the full leaderboard |
+| `get_stats` | Get overall stats |
+| `get_user` | Get user profile (defaults to self) |
+| `update_weight` | Update current weight |
+| `set_goal` | Set weight goal + type |
+| `post_trash_talk` | Post a trash talk message |
+| `get_messages` | Get recent messages |
+| `get_active_challenge` | Get the current active challenge |
+| `join_challenge` | Submit a challenge entry |
+
+## Deployment
+
 ```bash
-cd ~/repos/fijibod
-npx wrangler pages deploy . --project-name=fijibod-beta --branch=master
+# Deploy everything (worker + pages)
+npm run deploy
+
+# Deploy beta
+npm run deploy:beta
+
+# Individual deploys
+npm run deploy:worker
+npm run deploy:pages
 ```
 
-### Database Updates
-If schema changes:
+### Database Migrations
+
 ```bash
-# Apply migration to production
-npx wrangler d1 execute fijibod-db --remote --file=worker/migration.sql
+# Apply to production
+npx wrangler d1 execute fijibod-db --remote --file=worker/migrations/001-initial.sql
 
-# Apply migration to beta
-npx wrangler d1 execute fijibod-beta-db --remote --file=worker/migration.sql
+# Apply to beta
+npx wrangler d1 execute fijibod-beta-db --remote --file=worker/migrations/001-initial.sql
 ```
 
-## 🏗️ Architecture
+## API
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   fijibod.com   │────▶│  Cloudflare     │────▶│  D1 Database    │
-│  (Production)   │     │  Pages + Worker │     │  (Production)   │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
+See [API.md](API.md) for full endpoint documentation.
 
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│ beta.fijibod.com│────▶│  Cloudflare     │────▶│  D1 Database    │
-│     (Beta)      │     │  Pages + Worker │     │     (Beta)      │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-```
+## Tech Stack
 
-## 🔐 Security
+- **Frontend**: Pure HTML/CSS/JS (no build step), Cloudflare Pages
+- **Backend**: Cloudflare Worker + D1 (SQLite)
+- **MCP**: Node.js + @modelcontextprotocol/sdk
+- **Environments**: Separate prod/beta with independent databases
+
+## Security
 
 - Workouts/messages can only be edited/deleted by their owner
 - Name conflicts resolved with "Is this you?" modal
 - No server-side auth (trust-based for team use)
-
-## 📝 Changelog
-
-### Feb 6, 2026
-- Fixed tracker page structure (was truncated, causing missing workout history)
-- Changed edit workout to single modal with type, amount, and date fields
-- Changed workout history to show date only (no time)
-- Added `created_at` support to workout edit API
-
-### Feb 5, 2026
-- Added workout edit/delete functionality
-- Added goal type selector (lose/gain/maintain)
-- Replaced all browser prompts with styled modals
-- Added name uniqueness enforcement
-- Added personal workout history view
-- Added comprehensive test suite
-- Added audio players
-- Separated prod/beta environments
-
-## 🏢 About
-
-Built with 🔥 by the TaxHawk Engineering team for our Fiji trip.
-
-**The challenge**: Get beach-ready by June 4th. The competition is friendly but the results are permanent.
 
 ---
 

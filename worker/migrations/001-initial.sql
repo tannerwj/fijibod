@@ -64,9 +64,9 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 -- Seed initial challenge
-INSERT INTO challenges (week_number, name, description, rules, prize, start_date, end_date, is_active) 
+INSERT INTO challenges (week_number, name, description, rules, prize, start_date, end_date, is_active)
 VALUES (
-    1, 
+    1,
     'The 1000 Rep Gauntlet',
     '1000 reps total this week. Any exercise counts. Pushups, squats, lunges, crunches, burpees.',
     '100 reps = 10 points on the leaderboard|Must log reps within 24 hours|Video proof for final 100 reps|Winner gets bragging rights + mystery prize|Last place buys winner smoothie',
