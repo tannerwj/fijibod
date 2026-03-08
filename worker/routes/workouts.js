@@ -58,9 +58,12 @@ export async function logWorkout(db, body) {
 
   const points = calculatePoints(body.amount);
 
+  // Use provided created_at or default to now
+  const createdAt = body.created_at || new Date().toISOString().replace('T', ' ').slice(0, 19);
+  
   const result = await db.prepare(
-    'INSERT INTO workouts (user_id, workout_type, amount, points) VALUES (?, ?, ?, ?)'
-  ).bind(user.id, body.workout_type, body.amount, points).run();
+    'INSERT INTO workouts (user_id, workout_type, amount, points, created_at) VALUES (?, ?, ?, ?, ?)'
+  ).bind(user.id, body.workout_type, body.amount, points, createdAt).run();
 
   await db.prepare(
     'UPDATE users SET total_workouts = total_workouts + 1, total_points = total_points + ? WHERE id = ?'

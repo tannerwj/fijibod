@@ -892,10 +892,14 @@
             }
             
             try {
+                // Send local time to avoid UTC conversion issues
+                const now = new Date();
+                const localTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().replace('T', ' ').slice(0, 19);
+                
                 const res = await fetch(`${API_URL}/api/workouts`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_name: userName, workout_type: type, amount })
+                    body: JSON.stringify({ user_name: userName, workout_type: type, amount, created_at: localTime })
                 });
                 
                 const data = await res.json();
@@ -980,7 +984,7 @@
                 const today = new Date();
                 
                 workouts.forEach(w => {
-                    const workoutDate = new Date(w.created_at);
+                    const workoutDate = new Date(w.created_at.replace(' ', 'T'));
                     const dayDiff = Math.floor((today - workoutDate) / (1000 * 60 * 60 * 24));
                     if (dayDiff >= 0 && dayDiff < 7) {
                         const dayIndex = workoutDate.getDay();
@@ -1017,7 +1021,7 @@
                 }
                 
                 historyDiv.innerHTML = workouts.map(w => {
-                    const date = new Date(w.created_at);
+                    const date = new Date(w.created_at.replace(' ', 'T'));
                     const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                     // Escape for JS string
                     const safeType = w.workout_type.replace(/'/g, "\\'").replace(/"/g, '&quot;');
