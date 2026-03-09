@@ -376,9 +376,39 @@
             .countdown { gap: 1rem; }
             .countdown-item { padding: 1rem; min-width: 80px; }
         }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        .navbar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <a href="index.html">🏠 Home</a>
+        <a href="tracker.html">📊 Tracker</a>
+        <a href="leaderboard.html">🏆 Leaderboard</a>
+        <a href="challenge.html">⚔️ Challenges</a>
+        <a href="motivation.html">🔥 Motivation</a>
+    </nav>
     <!-- Hidden Easter Eggs -->
     <div class="hidden-palm palm-1" onclick="foundEgg(1)">🌴</div>
     <div class="hidden-palm palm-2" onclick="foundEgg(2)">🌴</div>
