@@ -48,22 +48,30 @@
             margin: 2rem 0;
         }
         
-        .home-link {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 1rem 2rem;
-            background: #ffd700;
-            color: #000;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 1.2rem;
-            transition: all 0.3s;
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            flex-wrap: wrap;
         }
-        
-        .home-link:hover {
-            transform: scale(1.1);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        .navbar a:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .island {
@@ -83,6 +91,13 @@
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <a href="index.html">🏠 Home</a>
+        <a href="tracker.html">📊 Tracker</a>
+        <a href="leaderboard.html">🏆 Leaderboard</a>
+        <a href="challenge.html">⚔️ Challenges</a>
+        <a href="motivation.html">🔥 Motivation</a>
+    </nav>
     <div class="island island-1">🏝️</div>
     <div class="island island-2">🌴</div>
     
@@ -99,7 +114,6 @@
         </p>
     </div>
     
-    <a href="index.html" class="home-link">🏠 Swim Back to Shore</a>
     
     <script>
         console.log('%c🌊 404 - LOST AT SEA 🌊', 'font-size: 25px; color: #00d4ff;');

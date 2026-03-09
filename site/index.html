@@ -150,79 +150,7 @@
             opacity: 0.8;
         }
         
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 3rem 0;
-        }
-        
-        .nav-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 2rem;
-            text-decoration: none;
-            color: white;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
-        
-        .nav-card:hover::before {
-            left: 100%;
-        }
-        
-        .nav-card:hover {
-            border-color: var(--ocean);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3);
-        }
-        
-        .nav-card.motivation {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 0, 0, 0.1));
-        }
-        
-        .nav-card.leaderboard {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.1));
-        }
-        
-        .nav-card.challenge {
-            background: linear-gradient(135deg, rgba(34, 139, 34, 0.2), rgba(0, 100, 0, 0.1));
-        }
-        
-        .nav-card.tracker {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 100, 200, 0.1));
-        }
-        
-        .nav-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-        
-        .nav-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-        
-        .nav-desc {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
+        /* nav-grid removed - using navbar instead */
         
         .status-bar {
             background: rgba(0, 0, 0, 0.3);
@@ -489,28 +417,6 @@
             </div>
         </div>
         
-        <div class="nav-grid">
-            <a href="motivation.html" class="nav-card motivation">
-                <span class="nav-icon">🔥</span>
-                <div class="nav-title">Get Motivated</div>
-                <div class="nav-desc">Six pack secrets, workout inspiration, and the harsh truth you need to hear</div>
-            </a>
-            <a href="leaderboard.html" class="nav-card leaderboard">
-                <span class="nav-icon">🏆</span>
-                <div class="nav-title">Leaderboard</div>
-                <div class="nav-desc">Who's putting in the work? Live rankings. Trash talk encouraged.</div>
-            </a>
-            <a href="challenge.html" class="nav-card challenge">
-                <span class="nav-icon">⚔️</span>
-                <div class="nav-title">Weekly Challenges</div>
-                <div class="nav-desc">Push-up contests, plank battles, step competitions. Glory awaits.</div>
-            </a>
-            <a href="tracker.html" class="nav-card tracker">
-                <span class="nav-icon">📊</span>
-                <div class="nav-title">Progress Tracker</div>
-                <div class="nav-desc">Log workouts, track weight, visualize gains. Data doesn't lie.</div>
-            </a>
-        </div>
         
         <div class="countdown-section" style="background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 100, 0, 0.1));">
             <h2 style="font-size: 2rem; margin-bottom: 1rem;">🚨 THE STAKES 🚨</h2>
