@@ -531,7 +531,7 @@
                         challenge.entries.map((e, i) => 
                             `<div style="display: flex; justify-content: space-between; padding: 0.5rem;">
                                 <span>${i+1}. ${e.user_name}</span>
-                                <span style="color: var(--gold); font-weight: 800;">${e.score} reps</span>
+                                <span style="color: var(--gold); font-weight: 800;">${e.score} ${challenge.score_label || 'reps'}</span>
                             </div>`
                         ).join('');
                     document.querySelector('.active-challenge').appendChild(scoresDiv);
