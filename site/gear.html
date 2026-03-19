@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎒 GEAR UP | Fiji Bod</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ocean: #00d4ff;
+            --sand: #ffe4b5;
+            --sunset: #ff6b35;
+            --palm: #228b22;
+            --night: #1a1a2e;
+            --gold: #ffd700;
+            --fire: #ff4500;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--ocean) 0%, #0066cc 50%, var(--night) 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .ocean-waves {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+            animation: wave 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes wave {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1440px; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        .navbar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3.5rem;
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+            color: var(--gold);
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        /* Category filter */
+        .category-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .category-btn:hover, .category-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Sections */
+        .category-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-desc {
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Tip callout — same as quote-box on index */
+        .tip {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--gold);
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 0 15px 15px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .tip strong { color: var(--gold); }
+
+        /* Product grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .product-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            border-color: var(--ocean);
+            transform: scale(1.02);
+        }
+
+        .product-tag {
+            display: inline-block;
+            background: rgba(255, 69, 0, 0.3);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+            width: fit-content;
+        }
+
+        .product-name {
+            font-weight: 800;
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .product-desc {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.5;
+            flex: 1;
+            margin-bottom: 1rem;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        .product-link {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--ocean), #0088cc);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .product-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Sub-headings within sections */
+        .sub-heading {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--ocean);
+            margin: 2rem 0 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sub-heading:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        /* Audio player */
+        .audio-player {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .audio-btn {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--gold);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            color: var(--gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .audio-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .audio-btn.playing {
+            background: rgba(255, 215, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .container { padding: 1rem; }
+            .product-grid { grid-template-columns: 1fr; }
+            .category-section { padding: 1.5rem; border-radius: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio Player -->
+    <div class="audio-player">
+        <button class="audio-btn" id="audioBtn" onclick="toggleAudio()" title="Fiji Vibes 🌴">
+            🔇
+        </button>
+        <audio id="audio" loop muted>
+            <source src="audio/fiji-ready.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="ocean-waves"></div>
+
+    <div class="container">
+        <nav class="navbar">
+            <a href="index.html">🏠 Home</a>
+            <a href="tracker.html">📊 Tracker</a>
+            <a href="leaderboard.html">🏆 Leaderboard</a>
+            <a href="challenge.html">⚔️ Challenges</a>
+            <a href="motivation.html">🔥 Motivation</a>
+            <a href="gear.html">🎒 Gear</a>
+        </nav>
+
+        <h1>🎒 Gear Up for Fiji</h1>
+        <p class="subtitle">Don't be the person who forgot a power adapter. We made you a list.</p>
+
+        <nav class="category-nav">
+            <button class="category-btn active" data-category="all">All</button>
+            <button class="category-btn" data-category="flight">✈️ Flight</button>
+            <button class="category-btn" data-category="power">⚡ Power</button>
+            <button class="category-btn" data-category="beach">🏖️ Beach</button>
+            <button class="category-btn" data-category="health">🩹 Health</button>
+            <button class="category-btn" data-category="packing">🧳 Packing</button>
+            <button class="category-btn" data-category="fun">🎉 Fun</button>
+        </nav>
+
+        <!-- ============ FLIGHT COMFORT ============ -->
+        <section class="category-section" data-section="flight">
+            <div class="section-title">✈️ Survive the Flight</div>
+            <div class="section-desc">10+ hours from the west coast. A good pillow and eye mask aren't luxuries &mdash; they're survival gear.</div>
+
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">🔌 Must Have</span>
+                    <div class="product-name">UCEC Airplane Audio Adapter (2-Pack)</div>
+                    <div class="product-desc">Dual-prong to 3.5mm so your headphones actually work with the seatback screen.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$6</span>
+                        <a href="https://www.amazon.com/dp/B011N2H1KK?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <span class="product-tag">⭐ Wirecutter Pick</span>
+                    <div class="product-name">TRAVELREST Nest Neck Pillow</div>
+                    <div class="product-desc">Memory foam, compact, washable. Clips to your luggage handle. NYT Wirecutter's top pick.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$30</span>
+                        <a href="https://www.amazon.com/dp/B011Q4NYOC?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Aeris Memory Foam Pillow Set</div>
+                    <div class="product-desc">Comes with carry bag, earplugs, and eye mask. One purchase, whole flight kit done.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$20</span>
+                        <a href="https://www.amazon.com/dp/B00JIPG09S?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <span class="product-tag">🏆 Gold Standard</span>
+                    <div class="product-name">Manta Sleep Mask</div>
+                    <div class="product-desc">100% blackout with adjustable eye cups. Zero pressure on your eyes. Game changer.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$35</span>
+                        <a href="https://www.amazon.com/dp/B07PRG2CQY?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Alaska Bear Silk Sleep Mask</div>
+                    <div class="product-desc">Mulberry silk both sides. Budget-friendly and gets the job done.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$10</span>
+                        <a href="https://www.amazon.com/dp/B00GSO1D9O?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Mack's Ultra Soft Earplugs (50-Pack)</div>
+                    <div class="product-desc">33dB NRR &mdash; highest rated foam earplugs. Enough to share with the whole row.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$10</span>
+                        <a href="https://www.amazon.com/dp/B0051U7W32?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Loop Quiet 2 Ear Plugs</div>
+                    <div class="product-desc">Reusable silicone, 24dB reduction. Actually look good enough to wear in public.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$25</span>
+                        <a href="https://www.amazon.com/dp/B0D3V6Y38G?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Wanderlust Compression Socks</div>
+                    <div class="product-desc">Medical-grade compression. Prevents swelling and DVT on long flights. Your legs will thank you.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$15</span>
+                        <a href="https://www.amazon.com/dp/B07FCW972S?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Seat Cushions</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-name">IHEALTHCOMFORT Gel Memory Foam Cushion</div>
+                    <div class="product-desc">Portable, foldable gel + memory foam with carrying handle. Your back will thank you at hour 8.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$30</span>
+                        <a href="https://www.amazon.com/dp/B08PND5KQR?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">BlissTrends 4.7" Memory Foam Cushion</div>
+                    <div class="product-desc">High-density memory foam, removable washable cover. Serious comfort for the long haul.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$30</span>
+                        <a href="https://www.amazon.com/dp/B0BZCJRJML?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ POWER & ELECTRONICS ============ -->
+        <section class="category-section" data-section="power">
+            <div class="section-title">⚡ Power & Electronics</div>
+            <div class="section-desc">Fiji uses Australian-style Type I outlets. Your US plugs will NOT fit. Get an adapter or live in darkness.</div>
+
+            <div class="tip">
+                <strong>🚨 Seriously:</strong> The outlets are angled 3-prong (Type I). No adapter = no charging your phone, laptop, or anything else. Order one now and throw it in your bag.
+            </div>
+
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">🔌 Get This One</span>
+                    <div class="product-name">TESSAN Fiji/AU Adapter (4 Outlets + 3 USB)</div>
+                    <div class="product-desc">Turns 1 Fiji outlet into 4 US plugs + 3 USB ports (1 USB-C). Compact 4oz. This is the one.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$27</span>
+                        <a href="https://www.amazon.com/dp/B0CB5B12YS?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">LENCENT Fiji/AU Adapter (4 Outlets + 4 USB)</div>
+                    <div class="product-desc">4 US outlets + 4 USB ports (2 USB-C). Maximum charging. Great for sharing with your roommate.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$25</span>
+                        <a href="https://www.amazon.com/dp/B0CPLTDKFR?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Portable Power</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">⭐ Top Pick</span>
+                    <div class="product-name">Anker Zolo 20,000mAh Power Bank</div>
+                    <div class="product-desc">30W fast charging, built-in USB-C cable. Charges your iPhone 4x over. Airline-safe.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$40</span>
+                        <a href="https://www.amazon.com/dp/B0CZ9LH53B?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">12,000mAh Charger w/ Built-in Wall Plug</div>
+                    <div class="product-desc">USB-C fast charging + integrated AC wall plug. No cable needed to recharge the bank itself.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$25</span>
+                        <a href="https://www.amazon.com/dp/B0CJ4Z9VCJ?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Waterproof Phone Protection</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">📱 Must Have</span>
+                    <div class="product-name">Hiearcool Waterproof Phone Pouch (2-Pack)</div>
+                    <div class="product-desc">IPX8, fits up to 8.9". Touchscreen works through the pouch. 70K+ reviews. Ten bucks.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$10</span>
+                        <a href="https://www.amazon.com/dp/B079HV3TC9?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">JOTO Waterproof Phone Case (2-Pack)</div>
+                    <div class="product-desc">IPX8, fits up to 7". Clear front and back with durable lanyard.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$8</span>
+                        <a href="https://www.amazon.com/dp/B07V8HGM7T?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SUN & BEACH ============ -->
+        <section class="category-section" data-section="beach">
+            <div class="section-title">🏖️ Sun & Beach</div>
+            <div class="section-desc">Protect the reef. Protect yourself. Look good doing it.</div>
+
+            <div class="tip">
+                <strong>🐠 Reef-safe sunscreen only.</strong> Fiji's coral reefs are world-class and fragile. Use mineral/zinc oxide sunscreen &mdash; no oxybenzone or octinoxate. Some areas require it, and it's the right thing to do.
+            </div>
+
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">☀️ Must Have</span>
+                    <div class="product-name">Thrive Natural Reef Safe SPF 50</div>
+                    <div class="product-desc">23.5% non-nano zinc oxide, minimal white cast. Hawaii 104 reef act compliant.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$17</span>
+                        <a href="https://www.amazon.com/dp/B0B4342J6V?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Reef Repair SPF 30+</div>
+                    <div class="product-desc">All natural, biodegradable. No oxybenzone, octinoxate, or titanium dioxide. Water resistant.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$22</span>
+                        <a href="https://www.amazon.com/dp/B07D11PPMM?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">All Good Sport SPF 30+ (2-Pack)</div>
+                    <div class="product-desc">Mineral zinc oxide, water and sweat resistant. Two 3oz tubes &mdash; enough for the trip.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$20</span>
+                        <a href="https://www.amazon.com/dp/B0721YXB69?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Rash Guards</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-name">Tuga Men's Snorkel Rash Guard, UPF 50+</div>
+                    <div class="product-desc">Made in USA. High neck, thumb holes for snorkeling. Blocks 98% UV.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$45</span>
+                        <a href="https://www.amazon.com/dp/B07B8B13VG?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">O'Neill Women's Skins UPF 50+ LS</div>
+                    <div class="product-desc">The industry standard. UPF 50+, minimal seams, quick-dry.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$30</span>
+                        <a href="https://www.amazon.com/dp/B0787NHPLD?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Water Shoes & Snorkel Gear</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">👟 #1 Seller</span>
+                    <div class="product-name">SEEKWAY Water Shoes</div>
+                    <div class="product-desc">Quick-dry aqua socks for reef walking. Unisex. Amazon's #1 best seller.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$12</span>
+                        <a href="https://www.amazon.com/dp/B081DYF22H?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">SIMARI Water Shoes</div>
+                    <div class="product-desc">Breathable quick-dry with rubber sole. Beach, reef, kayaking.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$13</span>
+                        <a href="https://www.amazon.com/dp/B07G2VY8NW?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <span class="product-tag">🤿 Top Pick</span>
+                    <div class="product-name">PRODIVE Snorkel Mask Set</div>
+                    <div class="product-desc">Dry-top snorkel + tempered glass lens. Anti-fog, watertight. Carry case included.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$25</span>
+                        <a href="https://www.amazon.com/dp/B0130UWUQ8?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">LUXPARD Snorkel Set</div>
+                    <div class="product-desc">Panoramic anti-fog mask + anti-leak dry snorkel. Mesh bag included.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$20</span>
+                        <a href="https://www.amazon.com/dp/B07V6LVRRS?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Dry Bags & Towels</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-name">HEETA Waterproof Dry Bag</div>
+                    <div class="product-desc">Roll-top closure, shoulder strap. Keep your stuff dry on boat trips and beach days.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$14</span>
+                        <a href="https://www.amazon.com/dp/B08QZ5YQ5D?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Pelican ExoDry Bag Set</div>
+                    <div class="product-desc">Rugged 500D PVC, zippered exterior pocket. Pelican durability.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$30</span>
+                        <a href="https://www.amazon.com/dp/B0C2SMWBJK?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">OlimpiaFit Quick-Dry Towel (3 Pack)</div>
+                    <div class="product-desc">Large, medium, small + mesh bag. Dries 3x faster than cotton. Packs tiny.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$17</span>
+                        <a href="https://www.amazon.com/dp/B08V11VJBF?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ HEALTH & SAFETY ============ -->
+        <section class="category-section" data-section="health">
+            <div class="section-title">🩹 Health & Safety</div>
+            <div class="section-desc">Don't let anything ruin the trip. Mosquitoes are real, water quality varies, and boat rides to outer islands can be rough.</div>
+
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">🦟 Must Have</span>
+                    <div class="product-name">Ben's 100% DEET Spray (1.25 oz)</div>
+                    <div class="product-desc">Maximum strength, lasts 10 hours. CDC recommended for the tropics. Travel size.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$8</span>
+                        <a href="https://www.amazon.com/dp/B0057QFFVG?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Repel Mosquito Wipes (30% DEET, 15ct)</div>
+                    <div class="product-desc">Individually wrapped, TSA-friendly. Toss a few in your carry-on.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$6</span>
+                        <a href="https://www.amazon.com/dp/B004NRPD7G?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Protect Life First Aid Kit (100-Piece)</div>
+                    <div class="product-desc">Compact at 7.5" x 5.2". Cuts, burns, sprains. Fits in any bag.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$15</span>
+                        <a href="https://www.amazon.com/dp/B07Q3FVY3P?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Water Purification</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-name">Potable Aqua Purification Tablets (50ct)</div>
+                    <div class="product-desc">Iodine-based tablets, treats water in 30 min. Lightweight emergency backup.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$9</span>
+                        <a href="https://www.amazon.com/dp/B0BL9TRHRF?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">SteriPEN Ultra UV Water Purifier</div>
+                    <div class="product-desc">USB rechargeable. Kills 99.99% of microorganisms. 1 liter in 90 seconds.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$80</span>
+                        <a href="https://www.amazon.com/dp/B00NK9948M?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Stomach & Motion Sickness</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-name">Imodium A-D Caplets (24ct)</div>
+                    <div class="product-desc">Tear-away blister packs, travel-ready. HSA/FSA eligible. Hope you don't need 'em.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$10</span>
+                        <a href="https://www.amazon.com/dp/B01ASIAW4W?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <span class="product-tag">🚤 For Boat Trips</span>
+                    <div class="product-name">Dramamine Less Drowsy (8ct Vial)</div>
+                    <div class="product-desc">Lasts 24 hours, less drowsy formula, pocket-sized. Take before the island hopper boat.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$5</span>
+                        <a href="https://www.amazon.com/dp/B007BF7BUY?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Dramamine Original (36ct)</div>
+                    <div class="product-desc">The classic. Dimenhydrinate for motion sickness and nausea. Share with the squad.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$8</span>
+                        <a href="https://www.amazon.com/dp/B0072DDMVM?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PACKING & ORGANIZATION ============ -->
+        <section class="category-section" data-section="packing">
+            <div class="section-title">🧳 Packing & Organization</div>
+            <div class="section-desc">Pack smart, travel light. Future you will be grateful.</div>
+
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">⭐ Top Pick</span>
+                    <div class="product-name">BAGAIL 8-Set Packing Cubes</div>
+                    <div class="product-desc">Multiple sizes, mesh tops for visibility. 50%+ recycled materials. Life-changing if you've never used cubes.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$25</span>
+                        <a href="https://www.amazon.com/dp/B08S35399Y?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Veken 8-Set Packing Cubes</div>
+                    <div class="product-desc">Includes laundry bag + toiletry bag. 4 sizes, fits carry-on and checked bags.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$18</span>
+                        <a href="https://www.amazon.com/dp/B0B7BFMHNF?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">BAGSMART TSA Clear Toiletry Bag (2-Pack)</div>
+                    <div class="product-desc">Quart-size thick PVC. Meets TSA 3-1-1 rules. No more scrambling at security.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$10</span>
+                        <a href="https://www.amazon.com/dp/B0BFR2C7Y1?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">TravelMore Silicone Luggage Tags (7-Pack)</div>
+                    <div class="product-desc">Multiple colors so you spot yours on the carousel. Privacy flap covers your info.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$9</span>
+                        <a href="https://www.amazon.com/dp/B071PDTV7Q?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">Forge TSA 4-Digit Combination Lock</div>
+                    <div class="product-desc">Durable alloy, easy-read dials. Inspection indicator shows if TSA opened your bag.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$10</span>
+                        <a href="https://www.amazon.com/dp/B07J1DNRJ4?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ FUN & ADVENTURE ============ -->
+        <section class="category-section" data-section="fun">
+            <div class="section-title">🎉 Fun & Adventure</div>
+            <div class="section-desc">Fiji has some of the best underwater scenery on Earth. Capture it. Also bring waterproof cards for resort nights.</div>
+
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">📸 The Best</span>
+                    <div class="product-name">GoPro HERO13 Black</div>
+                    <div class="product-desc">5.3K60 video, 27MP photos, waterproof to 33ft. HyperSmooth stabilization. If you're gonna do it, do it right.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$399</span>
+                        <a href="https://www.amazon.com/dp/B0DCM34GXX?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <span class="product-tag">💰 Budget Pick</span>
+                    <div class="product-name">GoPro HERO (Compact)</div>
+                    <div class="product-desc">4K video, 12MP photos, waterproof to 16ft. Great footage for half the price.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$199</span>
+                        <a href="https://www.amazon.com/dp/B0DCLRRHSP?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Waterproof Speakers</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-tag">🔊 Team Favorite</span>
+                    <div class="product-name">JBL Clip 4</div>
+                    <div class="product-desc">IP67, 10hr playtime. Carabiner clips to bags and beach chairs. The beach speaker.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$50</span>
+                        <a href="https://www.amazon.com/dp/B08PJ7JMQM?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">JBL Go 4</div>
+                    <div class="product-desc">Ultra-portable, IP67, 7hr battery. Fits in your palm. Surprisingly punchy bass.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$50</span>
+                        <a href="https://www.amazon.com/dp/B0CTNWBT1Z?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">JBL Flip 6</div>
+                    <div class="product-desc">IP67, 12hr playtime. PartyBoost lets you pair multiple speakers. Full sound.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$100</span>
+                        <a href="https://www.amazon.com/dp/B09GJVTRNZ?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-heading">Waterproof Games</div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-name">Hoyle Waterproof Playing Cards</div>
+                    <div class="product-desc">Flexible plastic, resists bending. Pool poker, beach blackjack. You know the drill.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$7</span>
+                        <a href="https://www.amazon.com/dp/B0BDWNGHCK?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <span class="product-tag">🃏 Group Night</span>
+                    <div class="product-name">UNO Splash (Waterproof UNO)</div>
+                    <div class="product-desc">Plastic cards with a clip to keep the deck together. Clips to your bag. Pool-side UNO wars.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$9</span>
+                        <a href="https://www.amazon.com/dp/B00TXI1NEW?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-name">LotFancy Waterproof Cards (2 Decks)</div>
+                    <div class="product-desc">100% PVC plastic, washable. Two full poker decks with cases.</div>
+                    <div class="product-footer">
+                        <span class="product-price">~$8</span>
+                        <a href="https://www.amazon.com/dp/B0858XJ8HN?tag=tannerwj-20" target="_blank" class="product-link">Amazon →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>🌴 Don't overthink it. Just order the adapter and the sunscreen. Everything else is bonus. 🌴</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">TaxHawk Engineering • Fiji 2026</p>
+        </footer>
+    </div>
+
+    <script src="beta-config.js"></script>
+    <script>
+        // Category filter
+        const buttons = document.querySelectorAll('.category-btn');
+        const sections = document.querySelectorAll('.category-section');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const cat = btn.dataset.category;
+                sections.forEach(s => {
+                    s.style.display = (cat === 'all' || s.dataset.section === cat) ? '' : 'none';
+                });
+            });
+        });
+
+        // Audio control
+        const audio = document.getElementById('audio');
+        const audioBtn = document.getElementById('audioBtn');
+        let isPlaying = false;
+
+        function toggleAudio() {
+            if (isPlaying) {
+                audio.pause();
+                audioBtn.textContent = '🔇';
+                audioBtn.classList.remove('playing');
+                isPlaying = false;
+            } else {
+                audio.muted = false;
+                audio.play().then(() => {
+                    audioBtn.textContent = '🎵';
+                    audioBtn.classList.add('playing');
+                    isPlaying = true;
+                }).catch(e => {
+                    console.log('Audio play failed:', e);
+                    alert('Click again to enable audio! 🔊');
+                });
+            }
+        }
+
+        // Console easter egg
+        console.log('%c🎒 GEAR UP FOR FIJI 🎒', 'font-size: 30px; color: #00d4ff;');
+        console.log('%cDon\'t forget the power adapter. Seriously.', 'font-size: 14px; color: #ffd700;');
+    </script>
+</body>
+</html>
