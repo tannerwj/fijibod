@@ -480,24 +480,28 @@
         // API_URL loaded from beta-config.js
         let userName = localStorage.getItem('fijiUserName') || 'Anonymous';
         let activeChallengeId = null;
-        
-        // Countdown to next Monday
+        let nextChallengeDate = null;
+
+        // Countdown to next challenge start (set from active challenge end_date)
         function updateNextChallenge() {
+            if (!nextChallengeDate) {
+                document.getElementById('nextChallenge').textContent = '--:--:--:--';
+                return;
+            }
             const now = new Date();
-            const nextMonday = new Date();
-            nextMonday.setDate(now.getDate() + (1 + 7 - now.getDay()) % 7);
-            nextMonday.setHours(0, 0, 0, 0);
-            if (nextMonday < now) nextMonday.setDate(nextMonday.getDate() + 7);
-            const diff = nextMonday - now;
+            const diff = nextChallengeDate - now;
+            if (diff <= 0) {
+                document.getElementById('nextChallenge').textContent = '00:00:00:00';
+                return;
+            }
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            document.getElementById('nextChallenge').textContent = 
+            document.getElementById('nextChallenge').textContent =
                 `${String(days).padStart(2, '0')}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
         setInterval(updateNextChallenge, 1000);
-        updateNextChallenge();
         
         // Load active challenge
         async function loadChallenge() {
@@ -506,7 +510,9 @@
                 if (!res.ok) throw new Error('No active challenge');
                 const challenge = await res.json();
                 activeChallengeId = challenge.id;
-                
+                nextChallengeDate = new Date(challenge.end_date + 'T00:00:00');
+                updateNextChallenge();
+
                 // Update DOM
                 document.querySelector('.challenge-title').textContent = challenge.name;
                 document.querySelector('.challenge-desc').textContent = challenge.description;
